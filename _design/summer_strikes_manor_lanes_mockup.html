@@ -1,0 +1,428 @@
+
+<style>
+  :root {
+    --sl-red: #C8102E;
+    --sl-navy: #1A2744;
+    --sl-gold: #F5A623;
+    --sl-light: #F8F6F2;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); }
+  .tab-bar { display: flex; gap: 4px; padding: 0 0 16px; border-bottom: 0.5px solid var(--color-border-tertiary); margin-bottom: 20px; flex-wrap: wrap; }
+  .tab-btn { padding: 7px 14px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: transparent; cursor: pointer; font-size: 13px; color: var(--color-text-secondary); transition: all .15s; }
+  .tab-btn.active { background: var(--sl-navy); color: #fff; border-color: var(--sl-navy); }
+  .tab-btn:hover:not(.active) { background: var(--color-background-secondary); }
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* LANDING PAGE */
+  .hero { background: var(--sl-navy); border-radius: var(--border-radius-lg); padding: 36px 28px; color: #fff; position: relative; overflow: hidden; margin-bottom: 16px; }
+  .hero-badge { display: inline-block; background: var(--sl-red); color: #fff; font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px; margin-bottom: 10px; letter-spacing: .5px; text-transform: uppercase; }
+  .hero h1 { font-size: 28px; font-weight: 500; line-height: 1.2; margin-bottom: 6px; }
+  .hero h1 span { color: var(--sl-gold); }
+  .hero p { font-size: 14px; opacity: .8; margin-bottom: 20px; max-width: 340px; }
+  .hero-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
+  .hero-pill { background: rgba(255,255,255,.12); border: 0.5px solid rgba(255,255,255,.2); color: #fff; font-size: 12px; padding: 5px 12px; border-radius: 20px; }
+  .hero-cta { display: inline-flex; align-items: center; gap: 8px; background: var(--sl-red); color: #fff; font-size: 14px; font-weight: 500; padding: 10px 22px; border-radius: var(--border-radius-md); border: none; cursor: pointer; }
+  .hero-pins { position: absolute; right: 20px; bottom: -10px; font-size: 72px; opacity: .07; }
+  .steps-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+  .step-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 16px 14px; text-align: center; }
+  .step-num { width: 28px; height: 28px; border-radius: 50%; background: var(--sl-navy); color: #fff; font-size: 13px; font-weight: 500; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; }
+  .step-card h3 { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 4px; }
+  .step-card p { font-size: 11px; color: var(--color-text-secondary); line-height: 1.5; }
+  .offer-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  .offer-card { background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 16px; border: 0.5px solid var(--color-border-tertiary); }
+  .offer-card h4 { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 4px; text-transform: uppercase; letter-spacing: .4px; }
+  .offer-card p { font-size: 14px; font-weight: 500; color: var(--color-text-primary); }
+  .schedule-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .schedule-table td { padding: 7px 10px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  .schedule-table td:first-child { color: var(--color-text-secondary); }
+  .schedule-table td:last-child { text-align: right; color: var(--color-text-primary); }
+  .unavail { color: var(--color-text-tertiary) !important; }
+  .section-label { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 10px; }
+
+  /* REGISTRATION */
+  .reg-header { background: var(--sl-red); color: #fff; border-radius: var(--border-radius-lg); padding: 14px 18px; margin-bottom: 16px; font-size: 14px; font-weight: 500; text-align: center; }
+  .form-section { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 18px; margin-bottom: 12px; }
+  .form-section h3 { font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 4px; }
+  .form-section .sub { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 14px; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .field-row.full { grid-template-columns: 1fr; }
+  .field-row.three { grid-template-columns: 2fr 1fr 1fr; }
+  .field label { font-size: 12px; color: var(--color-text-secondary); display: block; margin-bottom: 4px; }
+  .field input, .field select { width: 100%; height: 34px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-secondary); color: var(--color-text-primary); font-size: 13px; padding: 0 10px; }
+  .child-row { display: grid; grid-template-columns: 1fr 80px; gap: 10px; margin-bottom: 8px; align-items: end; }
+  .add-child { font-size: 12px; color: var(--sl-red); cursor: pointer; border: none; background: none; padding: 4px 0; }
+  .consent-row { display: flex; gap: 10px; padding: 10px 0; border-top: 0.5px solid var(--color-border-tertiary); align-items: flex-start; }
+  .consent-check { width: 14px; height: 14px; border: 0.5px solid var(--color-border-secondary); border-radius: 3px; background: var(--color-background-secondary); flex-shrink: 0; margin-top: 2px; }
+  .consent-row p { font-size: 11px; color: var(--color-text-secondary); line-height: 1.5; }
+  .consent-row p a { color: var(--sl-red); }
+  .submit-btn { width: 100%; background: var(--sl-red); color: #fff; font-size: 14px; font-weight: 500; padding: 12px; border-radius: var(--border-radius-md); border: none; cursor: pointer; margin-top: 4px; }
+  .progress-bar { display: flex; gap: 6px; margin-bottom: 16px; }
+  .prog-step { flex: 1; height: 4px; border-radius: 2px; }
+  .prog-step.done { background: var(--sl-red); }
+  .prog-step.pending { background: var(--color-border-tertiary); }
+
+  /* DASHBOARD */
+  .dash-header { background: var(--sl-navy); border-radius: var(--border-radius-lg); padding: 18px 20px; color: #fff; margin-bottom: 14px; display: flex; align-items: center; gap: 14px; }
+  .avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--sl-red); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 500; color: #fff; flex-shrink: 0; }
+  .dash-header h2 { font-size: 16px; font-weight: 500; }
+  .dash-header p { font-size: 12px; opacity: .7; margin-top: 2px; }
+  .dash-header .member-badge { margin-left: auto; background: var(--sl-gold); color: #000; font-size: 10px; font-weight: 500; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; }
+  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+  .stat-card { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 14px 12px; text-align: center; }
+  .stat-card .num { font-size: 22px; font-weight: 500; color: var(--color-text-primary); }
+  .stat-card .lbl { font-size: 11px; color: var(--color-text-secondary); margin-top: 3px; }
+  .voucher-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 16px 18px; margin-bottom: 10px; display: flex; align-items: center; gap: 14px; }
+  .voucher-icon { width: 40px; height: 40px; border-radius: var(--border-radius-md); background: #EDF3FC; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .voucher-info h4 { font-size: 14px; font-weight: 500; color: var(--color-text-primary); }
+  .voucher-info p { font-size: 12px; color: var(--color-text-secondary); margin-top: 2px; }
+  .voucher-status { margin-left: auto; text-align: right; }
+  .badge-avail { background: #EAF3DE; color: #3B6D11; font-size: 11px; padding: 4px 10px; border-radius: 20px; font-weight: 500; }
+  .badge-used { background: var(--color-background-secondary); color: var(--color-text-secondary); font-size: 11px; padding: 4px 10px; border-radius: 20px; }
+  .child-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 14px 16px; margin-bottom: 8px; }
+  .child-card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .child-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--color-background-info); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; color: var(--color-text-info); }
+  .child-card-header h4 { font-size: 14px; font-weight: 500; }
+  .child-card-header span { font-size: 12px; color: var(--color-text-secondary); }
+  .mini-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .mini-stat { text-align: center; background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 8px 4px; }
+  .mini-stat .v { font-size: 16px; font-weight: 500; color: var(--color-text-primary); }
+  .mini-stat .l { font-size: 10px; color: var(--color-text-secondary); margin-top: 2px; }
+  .notif-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 14px 16px; margin-bottom: 8px; display: flex; gap: 12px; align-items: flex-start; }
+  .notif-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--sl-red); flex-shrink: 0; margin-top: 5px; }
+  .notif-dot.read { background: var(--color-border-tertiary); }
+  .notif-card h4 { font-size: 13px; font-weight: 500; color: var(--color-text-primary); }
+  .notif-card p { font-size: 12px; color: var(--color-text-secondary); margin-top: 2px; }
+
+  /* FAQ */
+  .faq-search { width: 100%; height: 40px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-secondary); color: var(--color-text-primary); font-size: 14px; padding: 0 14px; margin-bottom: 16px; }
+  .faq-item { border-bottom: 0.5px solid var(--color-border-tertiary); padding: 14px 0; }
+  .faq-item h4 { font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 6px; display: flex; justify-content: space-between; cursor: pointer; }
+  .faq-item p { font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; }
+  .faq-cats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+  .faq-cat { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 16px; text-align: center; cursor: pointer; }
+  .faq-cat h4 { font-size: 14px; font-weight: 500; color: var(--color-text-primary); }
+  .faq-cat p { font-size: 12px; color: var(--color-text-secondary); margin-top: 3px; }
+
+  /* ADMIN */
+  .admin-metric-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+  .admin-metric { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 14px; }
+  .admin-metric .v { font-size: 22px; font-weight: 500; }
+  .admin-metric .l { font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; }
+  .sms-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 16px; margin-bottom: 10px; }
+  .sms-card h4 { font-size: 14px; font-weight: 500; margin-bottom: 10px; }
+  .sms-preview { background: var(--sl-navy); color: #fff; font-size: 12px; padding: 12px 14px; border-radius: var(--border-radius-md); margin-bottom: 10px; line-height: 1.6; }
+  .sms-actions { display: flex; gap: 8px; }
+  .btn-outline { border: 0.5px solid var(--color-border-secondary); background: transparent; color: var(--color-text-primary); font-size: 12px; padding: 7px 14px; border-radius: var(--border-radius-md); cursor: pointer; }
+  .btn-primary { border: none; background: var(--sl-red); color: #fff; font-size: 12px; padding: 7px 14px; border-radius: var(--border-radius-md); cursor: pointer; }
+  .member-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  .member-row:last-child { border-bottom: none; }
+  .member-info { flex: 1; }
+  .member-info h4 { font-size: 13px; font-weight: 500; }
+  .member-info p { font-size: 11px; color: var(--color-text-secondary); margin-top: 1px; }
+  .member-row .kids { font-size: 12px; color: var(--color-text-secondary); }
+  .badge-active { background: #EAF3DE; color: #3B6D11; font-size: 10px; padding: 3px 8px; border-radius: 20px; }
+
+  .wrapper { padding: 4px 0; }
+</style>
+
+<div class="wrapper">
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="showTab('landing')">Landing page</button>
+    <button class="tab-btn" onclick="showTab('register')">Registration</button>
+    <button class="tab-btn" onclick="showTab('dashboard')">Member dashboard</button>
+    <button class="tab-btn" onclick="showTab('faq')">FAQ</button>
+    <button class="tab-btn" onclick="showTab('admin')">Admin / SMS</button>
+  </div>
+
+  <!-- LANDING PAGE -->
+  <div class="screen active" id="tab-landing">
+    <div class="hero">
+      <div class="hero-badge">Manor Lanes · Summer 2025</div>
+      <h1>Summer <span>Strikes</span><br>Bowl Free All Summer</h1>
+      <p>Register your kids (ages 2–15) for 2 free games of bowling every single day — all summer long.</p>
+      <div class="hero-pills">
+        <div class="hero-pill">2 free games/day</div>
+        <div class="hero-pill">Ages 2–15</div>
+        <div class="hero-pill">Jun 1 – Aug 31</div>
+      </div>
+      <button class="hero-cta" onclick="sendPrompt('Show me the full landing page copy and hero section content for Summer Strikes')">Register now →</button>
+      <div class="hero-pins">🎳</div>
+    </div>
+
+    <div class="steps-row">
+      <div class="step-card">
+        <div class="step-num">1</div>
+        <h3>Register</h3>
+        <p>Create a free family account in minutes</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">2</div>
+        <h3>Get your pass</h3>
+        <p>Receive digital vouchers via email & text</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">3</div>
+        <h3>Bowl free</h3>
+        <p>Show your pass at the desk — bowl!</p>
+      </div>
+    </div>
+
+    <div class="offer-row">
+      <div class="offer-card">
+        <h4>Special offer</h4>
+        <p>2 Free Games Per Day, Per Child</p>
+      </div>
+      <div class="offer-card">
+        <h4>Age requirement</h4>
+        <p>Children ages 2–15</p>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="section-label">Available times</div>
+      <table class="schedule-table">
+        <tr><td>Monday</td><td class="unavail">Not available</td></tr>
+        <tr><td>Tuesday</td><td>11:00am – 5:00pm</td></tr>
+        <tr><td>Wednesday</td><td>11:00am – 5:00pm</td></tr>
+        <tr><td>Thursday</td><td>11:00am – 10:00pm</td></tr>
+        <tr><td>Friday</td><td>4:00pm – 6:00pm</td></tr>
+        <tr><td>Saturday</td><td>11:00am – 5:00pm</td></tr>
+        <tr><td>Sunday</td><td class="unavail">Not available</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- REGISTRATION -->
+  <div class="screen" id="tab-register">
+    <div class="progress-bar">
+      <div class="prog-step done"></div>
+      <div class="prog-step done"></div>
+      <div class="prog-step pending"></div>
+      <div class="prog-step pending"></div>
+    </div>
+    <div class="reg-header">Please complete the form below to register your children</div>
+
+    <div class="form-section">
+      <h3>Parent account information</h3>
+      <div class="sub">One account per household. You manage all children from here.</div>
+      <div class="field-row">
+        <div class="field"><label>First name *</label><input placeholder="Jane" /></div>
+        <div class="field"><label>Last name *</label><input placeholder="Smith" /></div>
+      </div>
+      <div class="field-row full">
+        <div class="field"><label>Address *</label><input placeholder="123 Main Street" /></div>
+      </div>
+      <div class="field-row three">
+        <div class="field"><label>City *</label><input placeholder="Amherst" /></div>
+        <div class="field"><label>State *</label><select><option>NY</option></select></div>
+        <div class="field"><label>Zip *</label><input placeholder="14228" /></div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h3>Children</h3>
+      <div class="sub">Add each child you'd like to enroll (ages 2–15).</div>
+      <div class="child-row">
+        <div class="field"><label>Child's full name</label><input placeholder="Emma Smith" /></div>
+        <div class="field"><label>Age</label><input placeholder="8" /></div>
+      </div>
+      <div class="child-row">
+        <div class="field"><label>Child's full name</label><input placeholder="Noah Smith" /></div>
+        <div class="field"><label>Age</label><input placeholder="11" /></div>
+      </div>
+      <button class="add-child">+ Add another child</button>
+    </div>
+
+    <div class="form-section">
+      <h3>Contact & login</h3>
+      <div class="sub">All voucher notifications are sent via email. Enter a valid email address.</div>
+      <div class="field-row">
+        <div class="field"><label>Email *</label><input placeholder="jane@email.com" /></div>
+        <div class="field"><label>Confirm email *</label><input placeholder="jane@email.com" /></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Password *</label><input type="password" placeholder="Min. 6 characters" /></div>
+        <div class="field"><label>Confirm password *</label><input type="password" placeholder="" /></div>
+      </div>
+      <div class="field-row full">
+        <div class="field"><label>Mobile phone (for text alerts)</label><input placeholder="(716) 555-1234" /></div>
+      </div>
+      <div class="consent-row">
+        <div class="consent-check"></div>
+        <p>I consent to receive SMS/text alerts from Manor Lanes about Summer Strikes vouchers and bowling updates. Msg &amp; data rates may apply. Reply STOP to unsubscribe. <a href="#">Terms &amp; Privacy</a></p>
+      </div>
+      <div class="consent-row">
+        <div class="consent-check"></div>
+        <p>I agree to the <a href="#">Terms of Use</a> and certify I am the parent/guardian of all registered children, and they live in my household.</p>
+      </div>
+      <button class="submit-btn" onclick="sendPrompt('What CartFlows checkout flow and WooCommerce Memberships setup do I need for the Summer Strikes registration?')">Continue →</button>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="screen" id="tab-dashboard">
+    <div class="dash-header">
+      <div class="avatar">JS</div>
+      <div>
+        <h2>Jane Smith</h2>
+        <p>2 children enrolled</p>
+      </div>
+      <div class="member-badge">Active</div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card"><div class="num">14</div><div class="lbl">Games bowled</div></div>
+      <div class="stat-card"><div class="num">6</div><div class="lbl">Days visited</div></div>
+      <div class="stat-card"><div class="num">89</div><div class="lbl">Days left</div></div>
+    </div>
+
+    <div class="section-label">Today's vouchers</div>
+    <div class="voucher-card">
+      <div class="voucher-icon">🎳</div>
+      <div class="voucher-info">
+        <h4>Emma Smith — 2 Free Games</h4>
+        <p>Valid today · Expires 11:59pm</p>
+      </div>
+      <div class="voucher-status"><div class="badge-avail">Available</div></div>
+    </div>
+    <div class="voucher-card">
+      <div class="voucher-icon">🎳</div>
+      <div class="voucher-info">
+        <h4>Noah Smith — 2 Free Games</h4>
+        <p>Valid today · Expires 11:59pm</p>
+      </div>
+      <div class="voucher-status"><div class="badge-avail">Available</div></div>
+    </div>
+
+    <div class="section-label" style="margin-top:14px">Children's stats</div>
+    <div class="child-card">
+      <div class="child-card-header">
+        <div class="child-avatar">ES</div>
+        <div><h4>Emma Smith</h4><span>Age 8</span></div>
+      </div>
+      <div class="mini-stats">
+        <div class="mini-stat"><div class="v">8</div><div class="l">Games</div></div>
+        <div class="mini-stat"><div class="v">87</div><div class="l">High score</div></div>
+        <div class="mini-stat"><div class="v">4</div><div class="l">Visits</div></div>
+      </div>
+    </div>
+    <div class="child-card">
+      <div class="child-card-header">
+        <div class="child-avatar">NS</div>
+        <div><h4>Noah Smith</h4><span>Age 11</span></div>
+      </div>
+      <div class="mini-stats">
+        <div class="mini-stat"><div class="v">6</div><div class="l">Games</div></div>
+        <div class="mini-stat"><div class="v">112</div><div class="l">High score</div></div>
+        <div class="mini-stat"><div class="v">3</div><div class="l">Visits</div></div>
+      </div>
+    </div>
+
+    <div class="section-label" style="margin-top:14px">Notifications</div>
+    <div class="notif-card">
+      <div class="notif-dot"></div>
+      <div><h4>Today's vouchers are ready!</h4><p>2 vouchers available for Emma and Noah — valid until 11:59pm tonight.</p></div>
+    </div>
+    <div class="notif-card">
+      <div class="notif-dot read"></div>
+      <div><h4>Weekend hours reminder</h4><p>Manor Lanes is open Sat 11am–5pm for Summer Strikes participants.</p></div>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="screen" id="tab-faq">
+    <input class="faq-search" placeholder="Search FAQs…" />
+    <div class="faq-item">
+      <h4>Is shoe rental included? <span>+</span></h4>
+      <p>Standard shoe rental rates apply and are not included in the Summer Strikes program.</p>
+    </div>
+    <div class="faq-item">
+      <h4>How do I get my daily vouchers? <span>+</span></h4>
+      <p>Vouchers reset each morning and are available in your member dashboard. You'll also receive an optional text alert via Twilio if you opted in during registration.</p>
+    </div>
+    <div class="faq-item">
+      <h4>Can I add more children later? <span>+</span></h4>
+      <p>Yes — log into your account, go to My Children, and add a new child. They must be ages 2–15 and live in your household.</p>
+    </div>
+    <div class="faq-item">
+      <h4>Can this be used for daycare or camp groups? <span>+</span></h4>
+      <p>No. This program is not valid for daycare outings, camps, business outings, or birthday party events.</p>
+    </div>
+    <div class="faq-item">
+      <h4>What is the Family Pass? <span>+</span></h4>
+      <p>The optional Family Pass lets adults bowl alongside their children during Summer Strikes hours for a one-time seasonal fee.</p>
+    </div>
+    <div class="faq-cats">
+      <div class="faq-cat" onclick="sendPrompt('Generate 10 FAQ items for the Family Pass category of Summer Strikes')">
+        <h4>Family pass</h4>
+        <p>5 articles</p>
+      </div>
+      <div class="faq-cat" onclick="sendPrompt('Generate 10 FAQ items for General Questions about the Summer Strikes program')">
+        <h4>General questions</h4>
+        <p>8 articles</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN / SMS -->
+  <div class="screen" id="tab-admin">
+    <div class="admin-metric-row">
+      <div class="admin-metric"><div class="v">312</div><div class="l">Families registered</div></div>
+      <div class="admin-metric"><div class="v">589</div><div class="l">Children enrolled</div></div>
+      <div class="admin-metric"><div class="v">1,204</div><div class="l">Vouchers redeemed</div></div>
+      <div class="admin-metric"><div class="v">247</div><div class="l">SMS subscribers</div></div>
+    </div>
+
+    <div class="section-label">Twilio SMS campaigns</div>
+    <div class="sms-card">
+      <h4>Daily voucher reminder</h4>
+      <div class="sms-preview">Hi {first_name}! 🎳 Your Summer Strikes vouchers for {child_names} are ready for today. Show this text or log in at manorlanes.com/summer. Reply STOP to opt out.</div>
+      <div class="sms-actions">
+        <button class="btn-outline">Edit message</button>
+        <button class="btn-outline">Schedule</button>
+        <button class="btn-primary" onclick="sendPrompt('How do I configure Twilio with WordPress to send automated daily SMS voucher reminders for Summer Strikes?')">Send now ↗</button>
+      </div>
+    </div>
+    <div class="sms-card">
+      <h4>Weekend hours alert</h4>
+      <div class="sms-preview">Manor Lanes reminder: Summer Strikes is available this Saturday 11am–5pm. See you on the lanes! Reply STOP to opt out.</div>
+      <div class="sms-actions">
+        <button class="btn-outline">Edit message</button>
+        <button class="btn-primary">Schedule ↗</button>
+      </div>
+    </div>
+
+    <div class="section-label" style="margin-top:8px">Recent registrations</div>
+    <div class="form-section" style="padding: 12px 16px;">
+      <div class="member-row">
+        <div class="avatar" style="width:30px;height:30px;font-size:12px;">KL</div>
+        <div class="member-info"><h4>Kim Lee</h4><p>kim@email.com · (716) 555-0101</p></div>
+        <div class="kids">3 kids</div>
+        <div class="badge-active">Active</div>
+      </div>
+      <div class="member-row">
+        <div class="avatar" style="width:30px;height:30px;font-size:12px;background:#1A2744">TR</div>
+        <div class="member-info"><h4>Tom Rivera</h4><p>triva@email.com · (716) 555-0289</p></div>
+        <div class="kids">2 kids</div>
+        <div class="badge-active">Active</div>
+      </div>
+      <div class="member-row">
+        <div class="avatar" style="width:30px;height:30px;font-size:12px;background:#F5A623;color:#000">AP</div>
+        <div class="member-info"><h4>Amy Patel</h4><p>amy.p@email.com · SMS off</p></div>
+        <div class="kids">1 kid</div>
+        <div class="badge-active">Active</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showTab(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>

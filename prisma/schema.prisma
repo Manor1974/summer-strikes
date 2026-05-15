@@ -36,8 +36,9 @@ model User {
   updatedAt           DateTime  @updatedAt
 
   children            Child[]
+  adults              Adult[]
   vouchers            Voucher[]
-  familyPass          FamilyPass?
+  pendingAdults       PendingAdult[]
   sessions            Session[]
   accounts            Account[]
 
@@ -60,35 +61,65 @@ model Child {
   @@index([userId])
 }
 
+// Family Pass member: age 16+, paid $49.95 to bowl alongside kids.
+// Created only after Stripe checkout succeeds.
+model Adult {
+  id                    String   @id @default(cuid())
+  userId                String
+  name                  String
+  age                   Int
+  highScore             Int      @default(0)
+  paidAmountCents       Int
+  stripeSessionId       String?  @unique
+  stripePaymentIntentId String?
+  paidAt                DateTime
+  programYear           Int
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vouchers              Voucher[]
+
+  @@index([userId])
+  @@index([programYear])
+}
+
+// Stash of unpaid adult sign-ups awaiting Stripe checkout completion.
+// On checkout.session.completed webhook, we promote these to Adult rows.
+// Cleaned up if the session expires.
+model PendingAdult {
+  id              String   @id @default(cuid())
+  userId          String
+  stripeSessionId String   @unique
+  name            String
+  age             Int
+  programYear     Int
+  createdAt       DateTime @default(now())
+
+  user            User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([stripeSessionId])
+}
+
 model Voucher {
   id              String    @id @default(cuid())
   userId          String
-  childId         String
+  childId         String?
+  adultId         String?
   validDate       DateTime  @db.Date
   redeemedAt      DateTime?
   redeemedByStaff String?
   gamesBowled     Int?
   createdAt       DateTime  @default(now())
 
-  user            User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  child           Child @relation(fields: [childId], references: [id], onDelete: Cascade)
+  user            User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  child           Child? @relation(fields: [childId], references: [id], onDelete: Cascade)
+  adult           Adult? @relation(fields: [adultId], references: [id], onDelete: Cascade)
 
   @@unique([childId, validDate])
+  @@unique([adultId, validDate])
   @@index([userId, validDate])
   @@index([validDate, redeemedAt])
-}
-
-model FamilyPass {
-  id               String    @id @default(cuid())
-  userId           String    @unique
-  stripeSessionId  String?
-  stripeCustomerId String?
-  active           Boolean   @default(false)
-  purchasedAt      DateTime?
-  expiresAt        DateTime?
-  createdAt        DateTime  @default(now())
-
-  user             User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 // NextAuth (Auth.js v5) models

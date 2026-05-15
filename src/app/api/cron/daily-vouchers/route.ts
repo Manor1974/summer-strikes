@@ -43,6 +43,7 @@ export async function GET(req: NextRequest) {
       phone: true,
       smsOptIn: true,
       children: { select: { id: true, name: true } },
+      adults: { select: { id: true, name: true } },
     },
   });
 
@@ -51,11 +52,12 @@ export async function GET(req: NextRequest) {
   let smsFailed = 0;
 
   for (const user of users) {
-    if (user.children.length === 0) continue;
+    const memberCount = user.children.length + user.adults.length;
+    if (memberCount === 0) continue;
 
-    // Create vouchers (skip if one already exists for this child+date)
-    const created = await prisma.$transaction(
-      user.children.map((child) =>
+    // Create vouchers for kids + paid adults. Upsert so reruns are no-ops.
+    const ops = [
+      ...user.children.map((child) =>
         prisma.voucher.upsert({
           where: {
             childId_validDate: { childId: child.id, validDate: dateOnly },
@@ -65,17 +67,34 @@ export async function GET(req: NextRequest) {
             childId: child.id,
             validDate: dateOnly,
           },
-          update: {}, // no-op if already exists
+          update: {},
         })
-      )
-    );
+      ),
+      ...user.adults.map((adult) =>
+        prisma.voucher.upsert({
+          where: {
+            adultId_validDate: { adultId: adult.id, validDate: dateOnly },
+          },
+          create: {
+            userId: user.id,
+            adultId: adult.id,
+            validDate: dateOnly,
+          },
+          update: {},
+        })
+      ),
+    ];
+    const created = await prisma.$transaction(ops);
     vouchersCreated += created.length;
 
     // SMS notification
     if (user.smsOptIn && user.phone) {
-      const childNames = user.children.map((c) => c.name.split(" ")[0]);
+      const memberNames = [
+        ...user.children.map((c) => c.name.split(" ")[0]),
+        ...user.adults.map((a) => a.name.split(" ")[0]),
+      ];
       try {
-        await sendSms(user.phone, smsTemplates.dailyVoucher(user.firstName, childNames));
+        await sendSms(user.phone, smsTemplates.dailyVoucher(user.firstName, memberNames));
         smsQueued++;
       } catch (err) {
         smsFailed++;

@@ -17,7 +17,7 @@ export default async function ShowVouchersPage() {
       validDate: dateOnly,
       redeemedAt: null,
     },
-    include: { child: true, user: true },
+    include: { child: true, adult: true, user: true },
     orderBy: { createdAt: "asc" },
   });
 
@@ -64,26 +64,32 @@ export default async function ShowVouchersPage() {
         <p className="mt-4 text-center text-sm opacity-80">{parentName}</p>
 
         <div className="mt-3 space-y-3">
-          {vouchers.map((v) => (
-            <div
-              key={v.id}
-              className="rounded-2xl bg-white px-6 py-5 text-sl-navy"
-            >
-              <p className="text-[11px] font-medium uppercase tracking-wider text-sl-navy/60">
-                Voucher · {v.id.slice(-6).toUpperCase()}
-              </p>
-              <h2 className="mt-2 text-2xl font-medium">{v.child.name}</h2>
-              <p className="text-sm text-sl-navy/60">Age {v.child.age}</p>
-              <div className="mt-4 rounded-lg bg-sl-light px-4 py-3 text-center">
-                <p className="text-xs uppercase tracking-wider text-sl-navy/60">
-                  Today&apos;s allotment
+          {vouchers.map((v) => {
+            const member = v.child ?? v.adult;
+            const isAdult = !!v.adult;
+            if (!member) return null;
+            return (
+              <div
+                key={v.id}
+                className="rounded-2xl bg-white px-6 py-5 text-sl-navy"
+              >
+                <p className="text-[11px] font-medium uppercase tracking-wider text-sl-navy/60">
+                  Voucher · {v.id.slice(-6).toUpperCase()}
+                  {isAdult && <span className="ml-2 text-sl-gold">FAMILY PASS</span>}
                 </p>
-                <p className="mt-1 text-2xl font-medium text-sl-red">
-                  2 Free Games
-                </p>
+                <h2 className="mt-2 text-2xl font-medium">{member.name}</h2>
+                <p className="text-sm text-sl-navy/60">Age {member.age}</p>
+                <div className="mt-4 rounded-lg bg-sl-light px-4 py-3 text-center">
+                  <p className="text-xs uppercase tracking-wider text-sl-navy/60">
+                    Today&apos;s allotment
+                  </p>
+                  <p className="mt-1 text-2xl font-medium text-sl-red">
+                    2 Free Games
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <p className="mt-6 text-center text-xs opacity-50">

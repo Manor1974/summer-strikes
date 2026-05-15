@@ -23,6 +23,7 @@ export default async function FamiliesPage({
       : { role: "PARENT" },
     include: {
       children: true,
+      adults: true,
       _count: {
         select: { vouchers: { where: { redeemedAt: { not: null } } } },
       },
@@ -52,7 +53,7 @@ export default async function FamiliesPage({
           <thead className="bg-sl-light text-left text-[11px] font-medium uppercase tracking-wider text-sl-navy/60">
             <tr>
               <th className="px-4 py-2">Parent</th>
-              <th className="px-4 py-2">Children</th>
+              <th className="px-4 py-2">Members</th>
               <th className="px-4 py-2">Contact</th>
               <th className="px-4 py-2">SMS</th>
               <th className="px-4 py-2 text-right">Redeemed</th>
@@ -71,8 +72,16 @@ export default async function FamiliesPage({
                 </td>
                 <td className="px-4 py-3 text-sl-navy">
                   {u.children.length} kid{u.children.length === 1 ? "" : "s"}
+                  {u.adults.length > 0 && (
+                    <span className="ml-1 text-sl-gold">
+                      + {u.adults.length} adult{u.adults.length === 1 ? "" : "s"}
+                    </span>
+                  )}
                   <div className="text-[11px] text-sl-navy/50">
-                    {u.children.map((c) => c.name.split(" ")[0]).join(", ")}
+                    {[
+                      ...u.children.map((c) => c.name.split(" ")[0]),
+                      ...u.adults.map((a) => a.name.split(" ")[0]),
+                    ].join(", ")}
                   </div>
                 </td>
                 <td className="px-4 py-3">

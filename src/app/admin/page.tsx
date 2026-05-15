@@ -8,31 +8,42 @@ export default async function AdminTodayPage() {
   const [
     totalFamilies,
     totalChildren,
+    paidAdults,
     smsCount,
     todayVouchers,
     redeemedAllTime,
+    familyPassRevenue,
   ] = await Promise.all([
     prisma.user.count({ where: { role: "PARENT" } }),
     prisma.child.count(),
+    prisma.adult.count(),
     prisma.user.count({ where: { smsOptIn: true } }),
     prisma.voucher.findMany({
       where: { validDate: dateOnly },
-      include: { child: true, user: true },
+      include: { child: true, adult: true, user: true },
       orderBy: [{ redeemedAt: "asc" }, { createdAt: "asc" }],
     }),
     prisma.voucher.count({ where: { redeemedAt: { not: null } } }),
+    prisma.adult.aggregate({
+      _sum: { paidAmountCents: true },
+    }),
   ]);
 
   const todayRedeemed = todayVouchers.filter((v) => v.redeemedAt).length;
   const todayAvailable = todayVouchers.length - todayRedeemed;
+  const revenueDollars = ((familyPassRevenue._sum?.paidAmountCents ?? 0) / 100).toLocaleString(
+    "en-US",
+    { style: "currency", currency: "USD" }
+  );
 
   return (
     <>
       <h1 className="text-xl font-medium text-sl-navy">Today · {isoDate}</h1>
 
-      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-5">
+      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-6">
         <Metric value={totalFamilies} label="Families" />
         <Metric value={totalChildren} label="Children" />
+        <Metric value={paidAdults} label="Family Pass" sub={revenueDollars} />
         <Metric value={smsCount} label="SMS subscribers" />
         <Metric value={todayAvailable} label="Vouchers today" sub={`${todayRedeemed} redeemed`} />
         <Metric value={redeemedAllTime.toLocaleString()} label="Redeemed all-time" />
@@ -60,11 +71,22 @@ export default async function AdminTodayPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-black/5">
-                {todayVouchers.map((v) => (
+                {todayVouchers.map((v) => {
+                  const member = v.child ?? v.adult;
+                  const isAdult = !!v.adult;
+                  if (!member) return null;
+                  return (
                   <tr key={v.id} className="hover:bg-sl-light/50">
                     <td className="px-4 py-3">
-                      <div className="font-medium text-sl-navy">{v.child.name}</div>
-                      <div className="text-xs text-sl-navy/50">Age {v.child.age}</div>
+                      <div className="font-medium text-sl-navy">
+                        {member.name}
+                        {isAdult && (
+                          <span className="ml-2 rounded-full bg-sl-gold/20 px-2 py-0.5 text-[10px] font-medium text-sl-gold">
+                            Adult
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-xs text-sl-navy/50">Age {member.age}</div>
                     </td>
                     <td className="px-4 py-3">
                       <div className="text-sl-navy">
@@ -93,7 +115,8 @@ export default async function AdminTodayPage() {
                       <RedeemButton voucherId={v.id} redeemed={!!v.redeemedAt} />
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>

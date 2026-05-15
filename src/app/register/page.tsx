@@ -40,7 +40,10 @@ export default function RegisterPage() {
   });
 
   const { fields, append, remove } = useFieldArray({ control, name: "children" });
+  const adultArray = useFieldArray({ control, name: "adults" });
   const smsOptIn = watch("smsOptIn");
+  const adults = watch("adults") ?? [];
+  const adultsTotal = (adults?.length ?? 0) * 49.95;
 
   const onSubmit: SubmitHandler<RegOutput> = async (data) => {
     setSubmitting(true);
@@ -55,6 +58,11 @@ export default function RegisterPage() {
       if (!res.ok) {
         setServerError(json.error || "Something went wrong. Try again.");
         setSubmitting(false);
+        return;
+      }
+      // If adults were added, redirect to Stripe Checkout for payment.
+      if (json.checkoutUrl) {
+        window.location.href = json.checkoutUrl;
         return;
       }
       router.push("/register/thanks");
@@ -188,6 +196,84 @@ export default function RegisterPage() {
           </button>
         </Section>
 
+        {/* Adults (Family Pass) */}
+        <Section
+          title="Family Pass — adults age 16+"
+          sub={`Optional. Add adults or older teens (16+) to bowl 2 free games per day alongside your kids — $49.95 per person, one-time.`}
+        >
+          {adultArray.fields.length === 0 ? (
+            <button
+              type="button"
+              onClick={() => adultArray.append({ name: "", age: "" as unknown as number })}
+              className="text-sm font-medium text-sl-red hover:underline"
+            >
+              + Add a Family Pass member
+            </button>
+          ) : (
+            <>
+              <div className="space-y-2.5">
+                {adultArray.fields.map((field, i) => (
+                  <div
+                    key={field.id}
+                    className="grid grid-cols-[1fr_90px_auto] items-end gap-2.5"
+                  >
+                    <Field
+                      label={i === 0 ? "Adult's full name" : ""}
+                      error={errors.adults?.[i]?.name?.message}
+                    >
+                      <input
+                        {...register(`adults.${i}.name` as const)}
+                        placeholder="Chris Smith"
+                        className={inputCls(!!errors.adults?.[i]?.name)}
+                      />
+                    </Field>
+                    <Field
+                      label={i === 0 ? "Age" : ""}
+                      error={errors.adults?.[i]?.age?.message}
+                    >
+                      <input
+                        {...register(`adults.${i}.age` as const)}
+                        placeholder="42"
+                        inputMode="numeric"
+                        className={inputCls(!!errors.adults?.[i]?.age)}
+                      />
+                    </Field>
+                    <button
+                      type="button"
+                      onClick={() => adultArray.remove(i)}
+                      aria-label="Remove adult"
+                      className="h-[34px] rounded-md border border-black/10 px-3 text-sl-navy/60 hover:border-sl-red hover:text-sl-red"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-3 flex items-center justify-between border-t border-black/5 pt-3 text-sm">
+                <button
+                  type="button"
+                  onClick={() =>
+                    adultArray.fields.length < 8 &&
+                    adultArray.append({ name: "", age: "" as unknown as number })
+                  }
+                  disabled={adultArray.fields.length >= 8}
+                  className="font-medium text-sl-red hover:underline disabled:opacity-50"
+                >
+                  + Add another adult
+                </button>
+                <div className="text-sl-navy">
+                  <span className="text-sl-navy/60">Family Pass total: </span>
+                  <span className="font-medium">${adultsTotal.toFixed(2)}</span>
+                </div>
+              </div>
+              <p className="mt-2 text-[11px] text-sl-navy/50">
+                Payment is collected by Stripe when you submit. Kids are free
+                either way — you can also add adults later from your dashboard.
+              </p>
+            </>
+          )}
+        </Section>
+
         {/* Contact & login */}
         <Section
           title="Contact & login"
@@ -291,7 +377,13 @@ export default function RegisterPage() {
             disabled={submitting}
             className="mt-3 w-full rounded-md bg-sl-red px-4 py-3 text-sm font-medium text-white transition hover:bg-sl-red-dark disabled:opacity-50"
           >
-            {submitting ? "Registering…" : "Continue →"}
+            {submitting
+              ? adultsTotal > 0
+                ? "Sending you to checkout…"
+                : "Registering…"
+              : adultsTotal > 0
+              ? `Continue to checkout · $${adultsTotal.toFixed(2)} →`
+              : "Continue →"}
           </button>
         </Section>
       </form>

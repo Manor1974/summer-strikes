@@ -59,15 +59,31 @@ const FAQS: { category: string; items: FaqItem[] }[] = [
     ],
   },
   {
-    category: "Family Pass (optional)",
+    category: "Family Pass — adults 16+",
     items: [
       {
         q: "What is the Family Pass?",
-        a: "The Family Pass is a paid upgrade that lets adults bowl alongside their children during Summer Strikes hours. It's a one-time seasonal fee, available during or after registration.",
+        a: "The Family Pass lets older teens and adults (age 16 and up) join Summer Strikes alongside the kids. Each paid member gets 2 free games of bowling per day, just like the kids — for the entire summer. It's $49.95 per person, one-time for the season.",
       },
       {
         q: "Do I need a Family Pass for my kids to bowl?",
-        a: "No — kids bowl free with Summer Strikes regardless of whether you buy a Family Pass. The pass is only for adults who want to bowl with them.",
+        a: "No — kids ages 2–15 bowl free with Summer Strikes regardless of whether you buy a Family Pass. The pass is only for additional household members age 16+.",
+      },
+      {
+        q: "How much does the Family Pass cost?",
+        a: "$49.95 per person, age 16 and up, for the entire Summer Strikes season (June 1 – August 31). No monthly fees, no renewals — one payment covers the whole summer.",
+      },
+      {
+        q: "Can I add Family Pass members after I've already registered?",
+        a: "Yes. Log into your dashboard and click 'Add Family Pass adult'. You can add as many as you'd like, anytime during the season.",
+      },
+      {
+        q: "Who can use a Family Pass?",
+        a: "Family members in your household age 16 and up. Each pass is tied to a named person and is non-transferable. The pass covers 2 games per day during Summer Strikes program hours.",
+      },
+      {
+        q: "Is there a refund if I don't use it?",
+        a: "Family Pass payments are non-refundable. We recommend adding adults only when you know they'll bowl regularly through the summer.",
       },
     ],
   },

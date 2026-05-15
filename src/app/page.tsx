@@ -25,14 +25,15 @@ export default function LandingPage() {
         </h1>
         <p className="mt-3 max-w-md text-sm opacity-80 sm:text-base">
           Register your kids (ages 2–15) for 2 free games of bowling every
-          single day — all summer long.
+          day — all summer long. Add adults 16+ with the Family Pass for
+          $49.95/person.
         </p>
         <div className="mt-5 flex flex-wrap gap-2">
           <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs">
-            2 free games/day
+            Kids free
           </span>
-          <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs">
-            Ages 2–15
+          <span className="rounded-full border border-sl-gold/40 bg-sl-gold/15 px-3 py-1 text-xs text-sl-gold">
+            Family Pass · $49.95
           </span>
           <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs">
             Jun 1 – Aug 31
@@ -87,18 +88,18 @@ export default function LandingPage() {
       <section className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div className="rounded-2xl border border-black/5 bg-sl-light p-5">
           <h4 className="text-[11px] font-medium uppercase tracking-wider text-sl-navy/60">
-            Special offer
+            Kids ages 2–15
           </h4>
           <p className="mt-1 text-sm font-medium text-sl-navy">
-            2 Free Games Per Day, Per Child
+            Free · 2 games per day
           </p>
         </div>
-        <div className="rounded-2xl border border-black/5 bg-sl-light p-5">
-          <h4 className="text-[11px] font-medium uppercase tracking-wider text-sl-navy/60">
-            Age requirement
+        <div className="rounded-2xl border border-sl-gold/40 bg-sl-gold/10 p-5">
+          <h4 className="text-[11px] font-medium uppercase tracking-wider text-sl-gold">
+            Family Pass · ages 16+
           </h4>
           <p className="mt-1 text-sm font-medium text-sl-navy">
-            Children ages 2–15
+            $49.95/person · 2 games per day
           </p>
         </div>
       </section>

@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { registrationSchema, normalizePhoneE164 } from "@/lib/schemas";
 import { sendSms, smsTemplates } from "@/lib/twilio";
 import { sendEmail, welcomeEmail } from "@/lib/email";
+import { createFamilyPassCheckout } from "@/lib/family-pass";
 
 function getClientIp(req: NextRequest): string {
   const fwd = req.headers.get("x-forwarded-for");
@@ -29,6 +30,7 @@ export async function POST(req: NextRequest) {
 
   const data = parsed.data;
   const ip = getClientIp(req);
+  const adultCount = data.adults?.length ?? 0;
 
   const existing = await prisma.user.findUnique({ where: { email: data.email } });
   if (existing) {
@@ -64,9 +66,13 @@ export async function POST(req: NextRequest) {
     include: { children: true },
   });
 
-  // Fire-and-forget notifications. Failures here shouldn't break registration.
-  const childNames = user.children.map((c) => c.name.split(" ")[0]);
-  const { subject, text, html } = welcomeEmail(user.firstName, user.children.length);
+  // Always send the kids-registered welcome email + SMS now.
+  // Adult Family Pass success will trigger a follow-up email from the webhook.
+  const { subject, text, html } = welcomeEmail(
+    user.firstName,
+    user.children.length,
+    adultCount
+  );
   Promise.allSettled([
     sendEmail({ to: user.email, subject, text, html }),
     user.smsOptIn && phoneE164
@@ -80,9 +86,28 @@ export async function POST(req: NextRequest) {
     });
   });
 
-  return NextResponse.json({
-    ok: true,
-    userId: user.id,
-    childNames,
-  });
+  // If adults are being added, create a Stripe Checkout Session.
+  if (adultCount > 0) {
+    try {
+      const { url } = await createFamilyPassCheckout({
+        userId: user.id,
+        userEmail: user.email,
+        adults: data.adults,
+        successPath: "/register/thanks?paid=1&session_id={CHECKOUT_SESSION_ID}",
+        cancelPath: "/register/thanks?paid=0",
+      });
+      return NextResponse.json({ ok: true, userId: user.id, checkoutUrl: url });
+    } catch (err) {
+      console.error("[register] Stripe checkout failed:", err);
+      // Don't fail the whole registration — kids are saved. User can retry from dashboard.
+      return NextResponse.json({
+        ok: true,
+        userId: user.id,
+        familyPassError:
+          "Your family is registered, but we couldn't start the Family Pass checkout. You can complete it from your dashboard.",
+      });
+    }
+  }
+
+  return NextResponse.json({ ok: true, userId: user.id });
 }

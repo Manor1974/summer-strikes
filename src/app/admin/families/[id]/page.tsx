@@ -13,9 +13,10 @@ export default async function FamilyDetailPage({
     where: { id },
     include: {
       children: { orderBy: { createdAt: "asc" } },
+      adults: { orderBy: { createdAt: "asc" } },
       vouchers: {
         orderBy: { validDate: "desc" },
-        include: { child: true },
+        include: { child: true, adult: true },
         take: 60,
       },
     },
@@ -90,6 +91,32 @@ export default async function FamilyDetailPage({
         ))}
       </div>
 
+      {user.adults.length > 0 && (
+        <>
+          <h2 className="mt-6 text-[11px] font-medium uppercase tracking-wider text-sl-navy/60">
+            Family Pass adults
+          </h2>
+          <div className="mt-2 grid gap-3 sm:grid-cols-2">
+            {user.adults.map((a) => (
+              <div key={a.id} className="rounded-2xl border border-sl-gold/30 bg-white p-4 shadow-sm">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-sl-navy">{a.name}</p>
+                    <p className="text-xs text-sl-navy/60">Age {a.age}</p>
+                  </div>
+                  <span className="rounded-full bg-sl-gold/20 px-2 py-0.5 text-[10px] font-medium text-sl-gold">
+                    ${(a.paidAmountCents / 100).toFixed(2)}
+                  </span>
+                </div>
+                <p className="mt-2 text-[11px] text-sl-navy/50">
+                  Paid {a.paidAt.toLocaleDateString()} · High score {a.highScore}
+                </p>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
       <h2 className="mt-8 text-[11px] font-medium uppercase tracking-wider text-sl-navy/60">
         Recent vouchers
       </h2>
@@ -108,12 +135,19 @@ export default async function FamilyDetailPage({
               </tr>
             </thead>
             <tbody className="divide-y divide-black/5">
-              {user.vouchers.map((v) => (
+              {user.vouchers.map((v) => {
+                const member = v.child ?? v.adult;
+                return (
                 <tr key={v.id}>
                   <td className="px-4 py-2 text-sl-navy">
                     {v.validDate.toISOString().slice(0, 10)}
                   </td>
-                  <td className="px-4 py-2 text-sl-navy/80">{v.child.name}</td>
+                  <td className="px-4 py-2 text-sl-navy/80">
+                    {member?.name ?? "—"}
+                    {v.adult && (
+                      <span className="ml-2 text-[10px] text-sl-gold">Adult</span>
+                    )}
+                  </td>
                   <td className="px-4 py-2">
                     {v.redeemedAt ? (
                       <span className="text-sl-navy/60">
@@ -125,7 +159,8 @@ export default async function FamilyDetailPage({
                     )}
                   </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         )}

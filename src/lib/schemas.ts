@@ -9,6 +9,14 @@ export const childSchema = z.object({
     .max(15, "Must be 15 or younger"),
 });
 
+export const adultSchema = z.object({
+  name: z.string().trim().min(2, "Adult's full name required").max(80),
+  age: z.coerce
+    .number()
+    .int("Age must be a whole number")
+    .min(16, "Family Pass is for ages 16+"),
+});
+
 export const registrationSchema = z
   .object({
     firstName: z.string().trim().min(1, "First name required").max(60),
@@ -22,6 +30,8 @@ export const registrationSchema = z
       .array(childSchema)
       .min(1, "Add at least one child")
       .max(8, "Maximum 8 children"),
+
+    adults: z.array(adultSchema).max(8, "Maximum 8 adults").default([]),
 
     email: z.string().trim().toLowerCase().email("Enter a valid email"),
     confirmEmail: z.string().trim().toLowerCase(),
@@ -57,6 +67,10 @@ export const registrationSchema = z
   });
 
 export type RegistrationInput = z.infer<typeof registrationSchema>;
+
+export const addAdultsSchema = z.object({
+  adults: z.array(adultSchema).min(1, "Add at least one adult").max(8),
+});
 
 export const loginSchema = z.object({
   email: z.string().trim().toLowerCase().email(),

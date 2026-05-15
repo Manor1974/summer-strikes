@@ -1,0 +1,129 @@
+// Summer Strikes — Prisma schema
+// Postgres in prod (Neon via Vercel Postgres); set DATABASE_URL.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  PARENT
+  ADMIN
+  STAFF
+}
+
+model User {
+  id                  String    @id @default(cuid())
+  email               String    @unique
+  passwordHash        String?
+  firstName           String
+  lastName            String
+  address             String
+  city                String
+  state               String
+  zip                 String
+  phone               String?
+  smsOptIn            Boolean   @default(false)
+  smsConsentAt        DateTime?
+  smsConsentIp        String?
+  termsAcceptedAt     DateTime
+  role                Role      @default(PARENT)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  children            Child[]
+  vouchers            Voucher[]
+  familyPass          FamilyPass?
+  sessions            Session[]
+  accounts            Account[]
+
+  @@index([phone])
+  @@index([role])
+}
+
+model Child {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  age       Int
+  highScore Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vouchers  Voucher[]
+
+  @@index([userId])
+}
+
+model Voucher {
+  id              String    @id @default(cuid())
+  userId          String
+  childId         String
+  validDate       DateTime  @db.Date
+  redeemedAt      DateTime?
+  redeemedByStaff String?
+  gamesBowled     Int?
+  createdAt       DateTime  @default(now())
+
+  user            User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  child           Child @relation(fields: [childId], references: [id], onDelete: Cascade)
+
+  @@unique([childId, validDate])
+  @@index([userId, validDate])
+  @@index([validDate, redeemedAt])
+}
+
+model FamilyPass {
+  id               String    @id @default(cuid())
+  userId           String    @unique
+  stripeSessionId  String?
+  stripeCustomerId String?
+  active           Boolean   @default(false)
+  purchasedAt      DateTime?
+  expiresAt        DateTime?
+  createdAt        DateTime  @default(now())
+
+  user             User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// NextAuth (Auth.js v5) models
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}

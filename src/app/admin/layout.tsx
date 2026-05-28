@@ -28,6 +28,9 @@ export default async function AdminLayout({
           <Link href="/admin/sms" className="text-xs opacity-70 hover:opacity-100">
             SMS
           </Link>
+          <Link href="/admin/announcement" className="text-xs opacity-70 hover:opacity-100">
+            Email
+          </Link>
           <span className="ml-auto text-xs opacity-60">{session.user.email}</span>
         </div>
       </nav>

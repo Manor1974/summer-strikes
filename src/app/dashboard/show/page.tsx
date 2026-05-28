@@ -1,8 +1,10 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import QRCode from "qrcode";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { todayInProgramTz } from "@/lib/dates";
+import { appBaseUrl } from "@/lib/stripe";
 
 export const dynamic = "force-dynamic";
 
@@ -45,6 +47,21 @@ export default async function ShowVouchersPage() {
     day: "numeric",
   });
   const parentName = vouchers[0].user.firstName + " " + vouchers[0].user.lastName;
+  const baseUrl = appBaseUrl();
+
+  // Generate one QR code per voucher (encodes the redemption URL).
+  const vouchersWithQr = await Promise.all(
+    vouchers.map(async (v) => {
+      const redeemUrl = `${baseUrl}/redeem/${v.id}`;
+      const qrDataUrl = await QRCode.toDataURL(redeemUrl, {
+        errorCorrectionLevel: "M",
+        margin: 1,
+        width: 360,
+        color: { dark: "#1a2744", light: "#ffffff" },
+      });
+      return { ...v, qrDataUrl };
+    })
+  );
 
   return (
     <main className="min-h-screen bg-sl-navy p-4 text-white">
@@ -64,7 +81,7 @@ export default async function ShowVouchersPage() {
         <p className="mt-4 text-center text-sm opacity-80">{parentName}</p>
 
         <div className="mt-3 space-y-3">
-          {vouchers.map((v) => {
+          {vouchersWithQr.map((v) => {
             const member = v.child ?? v.adult;
             const isAdult = !!v.adult;
             if (!member) return null;
@@ -79,7 +96,18 @@ export default async function ShowVouchersPage() {
                 </p>
                 <h2 className="mt-2 text-2xl font-medium">{member.name}</h2>
                 <p className="text-sm text-sl-navy/60">Age {member.age}</p>
-                <div className="mt-4 rounded-lg bg-sl-light px-4 py-3 text-center">
+
+                {/* QR code — staff scans this to mark redeemed */}
+                <div className="mt-4 flex justify-center rounded-lg bg-white p-3">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={v.qrDataUrl}
+                    alt={`Redemption QR code for ${member.name}`}
+                    className="h-48 w-48"
+                  />
+                </div>
+
+                <div className="mt-3 rounded-lg bg-sl-light px-4 py-3 text-center">
                   <p className="text-xs uppercase tracking-wider text-sl-navy/60">
                     Today&apos;s allotment
                   </p>
@@ -93,8 +121,8 @@ export default async function ShowVouchersPage() {
         </div>
 
         <p className="mt-6 text-center text-xs opacity-50">
-          Staff: mark vouchers redeemed in the admin panel after the games.
-          Shoe rental not included.
+          Staff: scan each QR code with your iPhone camera to confirm
+          redemption. Shoe rental not included.
         </p>
       </div>
     </main>

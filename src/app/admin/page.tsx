@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
-import { todayInProgramTz } from "@/lib/dates";
+import { todayInProgramTz, isProgramActive } from "@/lib/dates";
 import RedeemButton from "./redeem-button";
+import GenerateVouchersButton from "./generate-vouchers-button";
 
 export default async function AdminTodayPage() {
   const { dateOnly, isoDate } = todayInProgramTz();
@@ -36,9 +37,22 @@ export default async function AdminTodayPage() {
     { style: "currency", currency: "USD" }
   );
 
+  const programOn = isProgramActive();
+
   return (
     <>
-      <h1 className="text-xl font-medium text-sl-navy">Today · {isoDate}</h1>
+      <div className="flex items-center justify-between gap-3">
+        <h1 className="text-xl font-medium text-sl-navy">Today · {isoDate}</h1>
+        {!programOn && (
+          <GenerateVouchersButton />
+        )}
+      </div>
+      {!programOn && (
+        <p className="mt-1 text-xs text-sl-navy/60">
+          Program window opens Jun 1 — daily cron is idle until then. Use the
+          button above to manually generate today&apos;s vouchers for testing.
+        </p>
+      )}
 
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-6">
         <Metric value={totalFamilies} label="Families" />

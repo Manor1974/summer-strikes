@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { updateChildScore } from "../../actions";
+import VerifyPendingButton from "./verify-pending-button";
 
 export default async function FamilyDetailPage({
   params,
@@ -14,6 +15,7 @@ export default async function FamilyDetailPage({
     include: {
       children: { orderBy: { createdAt: "asc" } },
       adults: { orderBy: { createdAt: "asc" } },
+      pendingAdults: { orderBy: { createdAt: "asc" } },
       vouchers: {
         orderBy: { validDate: "desc" },
         include: { child: true, adult: true },
@@ -90,6 +92,36 @@ export default async function FamilyDetailPage({
           </form>
         ))}
       </div>
+
+      {user.pendingAdults.length > 0 && (
+        <>
+          <h2 className="mt-6 text-[11px] font-medium uppercase tracking-wider text-sl-red">
+            Pending Family Pass adults ({user.pendingAdults.length})
+          </h2>
+          <p className="mt-1 text-xs text-sl-navy/60">
+            These adults started checkout but the Stripe webhook hasn&apos;t
+            confirmed payment yet. Click &ldquo;Verify with Stripe&rdquo; to
+            query Stripe directly — if payment is confirmed, the adult is
+            promoted and the family receives the activation email.
+          </p>
+          <div className="mt-2 space-y-2">
+            {user.pendingAdults.map((p) => (
+              <div
+                key={p.id}
+                className="flex items-center justify-between gap-3 rounded-2xl border border-sl-red/20 bg-sl-red/5 px-4 py-3"
+              >
+                <div>
+                  <p className="text-sm font-medium text-sl-navy">{p.name}</p>
+                  <p className="text-xs text-sl-navy/60">
+                    Age {p.age} · session {p.stripeSessionId.slice(-10)} · started {p.createdAt.toLocaleString()}
+                  </p>
+                </div>
+                <VerifyPendingButton pendingId={p.id} />
+              </div>
+            ))}
+          </div>
+        </>
+      )}
 
       {user.adults.length > 0 && (
         <>

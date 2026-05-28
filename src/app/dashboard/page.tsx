@@ -3,6 +3,7 @@ import Link from "next/link";
 import { auth, signOut } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { todayInProgramTz, daysLeftInProgram, isProgramActive } from "@/lib/dates";
+import { BrandHeader } from "@/components/BrandHeader";
 
 export const dynamic = "force-dynamic";
 
@@ -77,24 +78,23 @@ export default async function DashboardPage() {
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-6 sm:py-10">
-      <div className="flex items-center justify-between">
-        <Link href="/" className="text-xs text-sl-navy/60 hover:text-sl-navy">
-          Summer Strikes
-        </Link>
-        <form
-          action={async () => {
-            "use server";
-            await signOut({ redirectTo: "/" });
-          }}
-        >
-          <button className="text-xs text-sl-navy/60 hover:text-sl-navy" type="submit">
-            Sign out
-          </button>
-        </form>
-      </div>
+      <BrandHeader
+        rightSlot={
+          <form
+            action={async () => {
+              "use server";
+              await signOut({ redirectTo: "/" });
+            }}
+          >
+            <button className="text-xs text-sl-navy/60 hover:text-sl-navy" type="submit">
+              Sign out
+            </button>
+          </form>
+        }
+      />
 
-      {/* Header */}
-      <div className="mt-3 flex items-center gap-4 rounded-2xl bg-sl-navy px-5 py-5 text-white">
+      {/* Family header */}
+      <div className="mt-4 flex items-center gap-4 rounded-2xl bg-sl-navy px-5 py-5 text-white">
         <div className="flex h-11 w-11 items-center justify-center rounded-full bg-sl-red text-sm font-medium">
           {initials}
         </div>

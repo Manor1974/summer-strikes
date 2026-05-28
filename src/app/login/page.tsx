@@ -17,11 +17,15 @@ export default function LoginPage() {
 
 function LoginShell({ children }: { children?: React.ReactNode }) {
   return (
-    <main className="mx-auto max-w-md px-4 py-12">
-      <Link href="/" className="text-xs text-sl-navy/60 hover:text-sl-navy">
-        ← Summer Strikes
+    <main className="mx-auto max-w-md px-4 py-10">
+      <Link href="/" className="flex items-center gap-2 text-sm font-bold tracking-tight text-sl-navy">
+        MANOR LANES
+        <span className="text-xs font-normal text-sl-navy/30">·</span>
+        <span className="text-xs font-normal text-sl-navy/60">
+          Summer <span className="text-sl-gold">Strikes</span>
+        </span>
       </Link>
-      <div className="mt-4 rounded-2xl bg-white p-7 shadow-sm border border-black/5">
+      <div className="mt-6 rounded-2xl bg-white p-7 shadow-sm border border-black/5">
         <h1 className="text-xl font-medium text-sl-navy">
           Welcome <span className="text-sl-gold">back</span>
         </h1>

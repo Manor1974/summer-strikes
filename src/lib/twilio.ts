@@ -15,7 +15,8 @@ function getClient() {
 }
 
 const OPTOUT_SUFFIX = " Reply STOP to opt out.";
-const DASHBOARD_URL = "manorlanes.com/summer-dashboard";
+const DASHBOARD_URL = "summer.manorlanes.com/dashboard";
+const SITE_URL = "summer.manorlanes.com";
 
 function ensureOptOutSuffix(body: string): string {
   return body.includes("STOP") ? body : `${body}${OPTOUT_SUFFIX}`;
@@ -47,7 +48,7 @@ export const smsTemplates = {
     return `Good morning ${firstName}! Today's Summer Strikes vouchers for ${kids} are ready. Show your screen at the desk. ${DASHBOARD_URL}`;
   },
   weekendReminder: () =>
-    `Manor Lanes reminder: Summer Strikes is available this weekend. See you on the lanes! manorlanes.com/summer`,
+    `Manor Lanes reminder: Summer Strikes is available this weekend. See you on the lanes! ${SITE_URL}`,
   programEnding: (daysLeft: number) =>
     `Only ${daysLeft} days left in Summer Strikes at Manor Lanes! Make the most of it.`,
 };

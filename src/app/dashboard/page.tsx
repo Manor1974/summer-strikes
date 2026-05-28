@@ -123,19 +123,15 @@ export default async function DashboardPage() {
         <Stat value={daysLeft} label="Days left" />
       </div>
 
-      {/* Today's vouchers */}
+      {/* Today's vouchers — if any exist, show them regardless of program window
+          (so admin-generated test vouchers appear pre-launch). */}
       <SectionLabel>Today&apos;s vouchers</SectionLabel>
-      {!programOn ? (
+      {user.vouchers.length === 0 ? (
         <Card>
           <p className="text-sm text-sl-navy/70">
-            Summer Strikes runs June 1 – August 31. Vouchers will appear here
-            each morning during the program.
-          </p>
-        </Card>
-      ) : user.vouchers.length === 0 ? (
-        <Card>
-          <p className="text-sm text-sl-navy/70">
-            Today&apos;s vouchers will be ready at 7am. Check back then.
+            {!programOn
+              ? "Summer Strikes runs June 1 – August 31. Vouchers will appear here each morning during the program."
+              : "Today's vouchers will be ready at 7am. Check back then."}
           </p>
         </Card>
       ) : (

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { PROGRAM_HOURS_BASE } from "@/lib/program-hours";
 
 const SCHEDULE = PROGRAM_HOURS_BASE.map((d) => ({
@@ -12,10 +13,24 @@ export default function LandingPage() {
     <main className="mx-auto max-w-3xl px-4 py-6 sm:py-10">
       {/* Hero */}
       <section className="relative overflow-hidden rounded-2xl bg-sl-navy px-7 py-10 text-white sm:px-10 sm:py-14">
-        <span className="inline-block rounded-full bg-sl-red px-3 py-1 text-[11px] font-medium uppercase tracking-wider">
-          Manor Lanes · Summer 2026
-        </span>
-        <h1 className="mt-3 text-3xl font-medium leading-tight sm:text-5xl">
+        {/* Brand row — Manor Lanes logo + season pill. Logo sits in a white
+            chip so the navy-on-white mark reads against the navy hero bg. */}
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-white p-1.5 shadow-sm sm:h-16 sm:w-16">
+            <Image
+              src="/manor-lanes-logo.svg"
+              alt="Manor Lanes"
+              width={64}
+              height={64}
+              className="h-full w-full object-contain"
+              priority
+            />
+          </div>
+          <span className="inline-block rounded-full bg-sl-red px-3 py-1 text-[11px] font-medium uppercase tracking-wider">
+            Summer 2026
+          </span>
+        </div>
+        <h1 className="mt-4 text-3xl font-medium leading-tight sm:text-5xl">
           Summer <span className="text-sl-gold">Strikes</span>
           <br />
           Bowl Free All Summer

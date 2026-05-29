@@ -19,22 +19,21 @@ export function BrandHeader({
     : null;
 
   return (
-    <div className="flex items-center justify-between gap-3 border-b border-black/5 pb-3">
-      <Link href={homeHref} className="flex items-center gap-2 group">
+    <div className="flex items-center justify-between gap-3 border-b border-black/5 pb-4">
+      <Link href={homeHref} className="flex items-center gap-3 group">
         {logoSrc ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={logoSrc}
             alt="Manor Lanes"
-            className="h-8 w-auto"
+            className="h-12 w-auto"
           />
         ) : (
-          <span className="text-sm font-bold tracking-tight text-sl-navy">
+          <span className="text-base font-black tracking-tight text-sl-navy">
             MANOR LANES
           </span>
         )}
-        <span className="text-xs text-sl-navy/30">·</span>
-        <span className="text-xs text-sl-navy/60 group-hover:text-sl-navy">
+        <span className="text-sm font-medium text-sl-navy/80 group-hover:text-sl-navy">
           Summer <span className="text-sl-gold">Strikes</span>
         </span>
       </Link>

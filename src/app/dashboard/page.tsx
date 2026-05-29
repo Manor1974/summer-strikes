@@ -155,7 +155,7 @@ export default async function DashboardPage() {
         </span>
       </div>
 
-      {/* Reservation code — tell the desk this to claim a lane without going through mybowlingpassport */}
+      {/* Reservation code — enter on the online reservation system to skip checkout */}
       {user.reservationCode && (
         <div className="mt-3 flex items-center justify-between gap-3 rounded-2xl border border-sl-gold/30 bg-sl-gold/10 px-4 py-3">
           <div>
@@ -166,8 +166,8 @@ export default async function DashboardPage() {
               {user.reservationCode}
             </p>
           </div>
-          <p className="max-w-[160px] text-right text-[11px] text-sl-navy/70">
-            Show this at the desk to reserve a lane &mdash; no payment, no
+          <p className="max-w-[180px] text-right text-[11px] text-sl-navy/70">
+            Enter this code online when you reserve a lane &mdash; no payment, no
             checkout.
           </p>
         </div>

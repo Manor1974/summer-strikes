@@ -266,6 +266,7 @@ export async function adminConfirmReservation(
       user: {
         select: {
           firstName: true,
+          lastName: true,
           email: true,
           phone: true,
           smsOptIn: true,
@@ -283,9 +284,66 @@ export async function adminConfirmReservation(
       `Manor Lanes: your reservation is CONFIRMED for ${dateStr} at ${timeStr} on lane ${laneNumber}. Family code ${r.user.reservationCode}.`
     ).catch((err) => console.error("[reservation/confirm] SMS failed:", err));
   }
+  // Queue the reservation for FRONTDESK1's PowerShell writer to push into
+  // Conqueror so it shows on the front-desk registration grid automatically.
+  postToReservationReceiver({
+    id: r.id,
+    reservation_date: r.reservationDate.toISOString().slice(0, 10),
+    start_time: r.startTime,
+    lane_number: laneNumber,
+    party_size: r.partySize,
+    family_code: r.user.reservationCode ?? "",
+    first_name: r.user.firstName,
+    last_name: r.user.lastName,
+    email: r.user.email,
+    phone: r.user.phone ?? "",
+    notes: r.notes ?? "",
+  }).catch((err) =>
+    console.error("[reservation/confirm] receiver POST failed:", err)
+  );
   revalidatePath("/admin/reservations");
   revalidatePath("/dashboard");
   return { ok: true };
+}
+
+// Fire-and-forget POST to manorlanes.com/lm/summer-strikes-reservation-receiver.php
+// so FRONTDESK1's PowerShell writer picks it up on next poll and writes it
+// into Conqueror. Doesn't throw — the confirm action must not fail if the
+// WP receiver is briefly unreachable. Admin can re-trigger via a future
+// /admin/reservations 'Re-send to Conqueror' button.
+async function postToReservationReceiver(payload: {
+  id: string;
+  reservation_date: string;
+  start_time: string;
+  lane_number: number;
+  party_size: number;
+  family_code: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+  notes: string;
+}) {
+  const url = process.env.RESERVATION_RECEIVER_URL;
+  const password = process.env.RESERVATION_RECEIVER_PASSWORD;
+  if (!url || !password) {
+    console.warn("[reservation] receiver URL/password not configured — skipped");
+    return;
+  }
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password, reservation: payload }),
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!res.ok) {
+      const txt = await res.text().catch(() => "");
+      console.error(`[reservation] receiver ${res.status}: ${txt.slice(0, 200)}`);
+    }
+  } catch (err) {
+    console.error("[reservation] receiver POST failed:", err);
+  }
 }
 
 export async function adminCancelReservation(reservationId: string) {

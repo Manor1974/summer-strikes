@@ -5,6 +5,17 @@ import bcrypt from "bcryptjs";
 import { prisma } from "./prisma";
 import { loginSchema } from "./schemas";
 
+// Email allowlist (mirrors lib/admin.ts but inlined here to avoid the
+// 'server-only' barrier — auth.ts is consumed from middleware/edge in places.)
+function adminEmailSet(): Set<string> {
+  return new Set(
+    (process.env.ADMIN_EMAILS || "")
+      .split(",")
+      .map((e) => e.trim().toLowerCase())
+      .filter(Boolean)
+  );
+}
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
   // 30-day session so the front-desk iPad stays signed in all summer without
@@ -26,11 +37,21 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (!user?.passwordHash) return null;
         const ok = await bcrypt.compare(password, user.passwordHash);
         if (!ok) return null;
+
+        // If this email is in ADMIN_EMAILS but the DB row is still PARENT
+        // (e.g. an admin who registered as a normal parent first), surface
+        // ADMIN in the session so role-based UI checks work without a DB
+        // mutation. Doesn't downgrade anyone — only escalates.
+        const effectiveRole =
+          user.role === "PARENT" && adminEmailSet().has(user.email.toLowerCase())
+            ? "ADMIN"
+            : user.role;
+
         return {
           id: user.id,
           email: user.email,
           name: `${user.firstName} ${user.lastName}`,
-          role: user.role,
+          role: effectiveRole,
         };
       },
     }),

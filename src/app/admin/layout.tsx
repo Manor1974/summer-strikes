@@ -31,6 +31,9 @@ export default async function AdminLayout({
           <Link href="/admin/announcement" className="text-xs opacity-70 hover:opacity-100">
             Email
           </Link>
+          <Link href="/admin/staff-guide" className="text-xs opacity-70 hover:opacity-100">
+            Staff guide
+          </Link>
           <span className="ml-auto text-xs opacity-60">{session.user.email}</span>
         </div>
       </nav>

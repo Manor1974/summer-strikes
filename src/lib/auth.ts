@@ -7,7 +7,10 @@ import { loginSchema } from "./schemas";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
-  session: { strategy: "jwt", maxAge: 60 * 60 * 8 },
+  // 30-day session so the front-desk iPad stays signed in all summer without
+  // anyone having to re-enter the staff password mid-shift. Sessions still
+  // auto-extend on each request (rolling).
+  session: { strategy: "jwt", maxAge: 60 * 60 * 24 * 30, updateAge: 60 * 60 * 24 },
   pages: { signIn: "/login" },
   providers: [
     Credentials({

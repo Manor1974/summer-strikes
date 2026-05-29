@@ -80,16 +80,26 @@ export default async function DashboardPage() {
     <main className="mx-auto max-w-2xl px-4 py-6 sm:py-10">
       <BrandHeader
         rightSlot={
-          <form
-            action={async () => {
-              "use server";
-              await signOut({ redirectTo: "/" });
-            }}
-          >
-            <button className="text-xs text-sl-navy/60 hover:text-sl-navy" type="submit">
-              Sign out
-            </button>
-          </form>
+          <div className="flex items-center gap-4">
+            {(session.user.role === "ADMIN" || session.user.role === "STAFF") && (
+              <Link
+                href="/admin"
+                className="text-xs font-medium text-sl-red hover:text-sl-red-dark"
+              >
+                Admin panel →
+              </Link>
+            )}
+            <form
+              action={async () => {
+                "use server";
+                await signOut({ redirectTo: "/" });
+              }}
+            >
+              <button className="text-xs text-sl-navy/60 hover:text-sl-navy" type="submit">
+                Sign out
+              </button>
+            </form>
+          </div>
         }
       />
 

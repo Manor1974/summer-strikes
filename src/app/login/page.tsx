@@ -41,7 +41,7 @@ function LoginShell({ children }: { children?: React.ReactNode }) {
 function LoginForm() {
   const router = useRouter();
   const params = useSearchParams();
-  const callbackUrl = params.get("callbackUrl") || "/dashboard";
+  const explicitCallback = params.get("callbackUrl");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -62,7 +62,24 @@ function LoginForm() {
       setSubmitting(false);
       return;
     }
-    router.push(callbackUrl);
+
+    // If user was bounced to login from a specific page, send them back there.
+    // Otherwise pick a sensible default based on their role:
+    //   ADMIN / STAFF → /admin
+    //   PARENT        → /dashboard
+    let target = explicitCallback;
+    if (!target) {
+      try {
+        const session = await fetch("/api/auth/session", {
+          cache: "no-store",
+        }).then((r) => r.json());
+        const role = session?.user?.role;
+        target = role === "ADMIN" || role === "STAFF" ? "/admin" : "/dashboard";
+      } catch {
+        target = "/dashboard";
+      }
+    }
+    router.push(target);
     router.refresh();
   };
 

@@ -72,7 +72,12 @@ export default async function FamilyDetailPage({
             className="rounded-2xl border border-black/5 bg-white p-4 shadow-sm"
           >
             <p className="text-sm font-medium text-sl-navy">{c.name}</p>
-            <p className="text-xs text-sl-navy/60">Age {c.age}</p>
+            <p className="text-xs text-sl-navy/60">
+              Age {c.age} · Bowler ID{" "}
+              <span className="font-mono text-sl-navy">
+                {String(c.bowlerNumber).padStart(4, "0")}
+              </span>
+            </p>
             <div className="mt-3 flex items-end gap-2">
               <div className="flex-1">
                 <label className="block text-[11px] text-sl-navy/60">
@@ -139,7 +144,12 @@ export default async function FamilyDetailPage({
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="text-sm font-medium text-sl-navy">{a.name}</p>
-                    <p className="text-xs text-sl-navy/60">Age {a.age}</p>
+                    <p className="text-xs text-sl-navy/60">
+                      Age {a.age} · Bowler ID{" "}
+                      <span className="font-mono text-sl-navy">
+                        {String(a.bowlerNumber).padStart(4, "0")}
+                      </span>
+                    </p>
                   </div>
                   <span className="rounded-full bg-sl-gold/20 px-2 py-0.5 text-[10px] font-medium text-sl-gold">
                     ${(a.paidAmountCents / 100).toFixed(2)}

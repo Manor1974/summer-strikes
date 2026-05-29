@@ -34,6 +34,9 @@ export default async function AdminLayout({
           <Link href="/admin/staff" className="text-xs opacity-70 hover:opacity-100">
             Staff
           </Link>
+          <Link href="/admin/conqueror" className="text-xs opacity-70 hover:opacity-100">
+            FBT
+          </Link>
           <Link href="/admin/staff-guide" className="text-xs opacity-70 hover:opacity-100">
             Guide
           </Link>

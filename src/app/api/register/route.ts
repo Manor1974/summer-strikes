@@ -5,6 +5,7 @@ import { registrationSchema, normalizePhoneE164 } from "@/lib/schemas";
 import { sendSms, smsTemplates } from "@/lib/twilio";
 import { sendEmail, welcomeEmail } from "@/lib/email";
 import { createFamilyPassCheckout } from "@/lib/family-pass";
+import { postToFbtReceiver } from "@/lib/fbt-export";
 
 function getClientIp(req: NextRequest): string {
   const fwd = req.headers.get("x-forwarded-for");
@@ -78,6 +79,17 @@ export async function POST(req: NextRequest) {
     user.smsOptIn && phoneE164
       ? sendSms(phoneE164, smsTemplates.registration(user.firstName))
       : Promise.resolve(),
+    // Auto-POST kids to Conqueror FBT receiver (paid adults POST from the
+    // Stripe webhook after payment confirms, not here).
+    postToFbtReceiver(
+      user.children.map((c) => ({
+        bowlerNumber: c.bowlerNumber,
+        name: c.name,
+        registeredAt: c.createdAt,
+        kind: "child" as const,
+        age: c.age,
+      }))
+    ),
   ]).then((results) => {
     results.forEach((r, i) => {
       if (r.status === "rejected") {

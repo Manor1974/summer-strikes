@@ -3,6 +3,7 @@ import Stripe from "stripe";
 import { prisma } from "@/lib/prisma";
 import { stripe, FAMILY_PASS_PRICE_DOLLARS } from "@/lib/stripe";
 import { sendEmail, familyPassActiveEmail } from "@/lib/email";
+import { postToFbtReceiver } from "@/lib/fbt-export";
 
 export const dynamic = "force-dynamic";
 
@@ -67,9 +68,10 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       : session.payment_intent?.id ?? null;
 
   // Promote each pending adult into an Adult row.
+  const promoted: { bowlerNumber: number; name: string; age: number; createdAt: Date }[] = [];
   await prisma.$transaction(async (tx) => {
     for (const p of pending) {
-      await tx.adult.create({
+      const a = await tx.adult.create({
         data: {
           userId: p.userId,
           name: p.name,
@@ -80,12 +82,25 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
           paidAt,
           programYear: p.programYear,
         },
+        select: { bowlerNumber: true, name: true, age: true, createdAt: true },
       });
+      promoted.push(a);
     }
     await tx.pendingAdult.deleteMany({
       where: { stripeSessionId: session.id },
     });
   });
+
+  // Auto-POST newly-paid adults to Conqueror FBT receiver
+  postToFbtReceiver(
+    promoted.map((a) => ({
+      bowlerNumber: a.bowlerNumber,
+      name: a.name,
+      registeredAt: a.createdAt,
+      kind: "adult" as const,
+      age: a.age,
+    }))
+  ).catch((err) => console.error("[stripe/webhook] FBT POST failed:", err));
 
   // Send confirmation email.
   const user = await prisma.user.findUnique({

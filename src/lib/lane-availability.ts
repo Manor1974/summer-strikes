@@ -1,4 +1,5 @@
 import "server-only";
+import { hoursForDate } from "./program-hours";
 
 // Manor Lanes' own lane-availability feed, published by
 // lane-availability-poller.ps1 on FRONTDESK1 every minute. The poller writes
@@ -18,9 +19,26 @@ import "server-only";
 const FEED_URL = "https://manorlanes.com/lm/data/lane-availability.json";
 
 export type LaneStatus =
-  | { status: "open_now"; lanesOpen: number; lanesTotal: number; updatedAt: string }
+  | {
+      status: "open_now";
+      lanesOpen: number;
+      lanesTotal: number;
+      closesAt: string | null;
+      updatedAt: string;
+    }
   | { status: "closed_now"; updatedAt: string }
   | { status: "unknown" };
+
+// Extract closing time from today's program hours ("5:00pm – 11:00pm" → "11:00pm")
+function closingTimeToday(): string | null {
+  const todayET = new Date(
+    new Date().toLocaleString("en-US", { timeZone: "America/New_York" })
+  );
+  const hours = hoursForDate(todayET);
+  if (!hours) return null;
+  const match = hours.match(/–\s*([0-9: apm]+)$/i);
+  return match ? match[1].trim() : null;
+}
 
 type Feed = {
   updated_at?: string;
@@ -49,6 +67,7 @@ export async function getLaneStatus(): Promise<LaneStatus> {
       status: "open_now",
       lanesOpen: feed.lanes_available_now,
       lanesTotal: feed.lanes_total ?? 24,
+      closesAt: closingTimeToday(),
       updatedAt,
     };
   } catch {
@@ -65,10 +84,11 @@ export function laneStatusLabel(s: LaneStatus): {
   if (s.status === "open_now") {
     const tone: "green" | "amber" =
       s.lanesOpen === 0 ? "amber" : "green";
+    const openUntil = s.closesAt ? `We're open until ${s.closesAt}` : "We're open now";
     const text =
       s.lanesOpen === 0
-        ? "Open · no lanes free right now"
-        : `Open now · ${s.lanesOpen} of ${s.lanesTotal} lane${s.lanesTotal === 1 ? "" : "s"} available`;
+        ? `${openUntil} · no lanes free right now`
+        : `${openUntil} · ${s.lanesOpen} of ${s.lanesTotal} lane${s.lanesTotal === 1 ? "" : "s"} available`;
     return { text, sub: relativeAgo(s.updatedAt), tone };
   }
   if (s.status === "closed_now") {

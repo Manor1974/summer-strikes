@@ -53,6 +53,7 @@ export default async function DashboardPage() {
     return {
       kind: "child" as const,
       id: c.id,
+      bowlerNumber: c.bowlerNumber,
       name: c.name,
       age: c.age,
       highScore: c.highScore,
@@ -65,6 +66,7 @@ export default async function DashboardPage() {
     return {
       kind: "adult" as const,
       id: a.id,
+      bowlerNumber: a.bowlerNumber,
       name: a.name,
       age: a.age,
       highScore: a.highScore,
@@ -253,7 +255,12 @@ export default async function DashboardPage() {
                     </span>
                   )}
                 </h4>
-                <p className="text-xs text-sl-navy/60">Age {m.age}</p>
+                <p className="text-xs text-sl-navy/60">
+                  Age {m.age} · Bowler ID{" "}
+                  <span className="font-mono text-sl-navy">
+                    {String(m.bowlerNumber).padStart(4, "0")}
+                  </span>
+                </p>
               </div>
             </div>
             <div className="mt-3 grid grid-cols-3 gap-2">

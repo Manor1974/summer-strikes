@@ -48,13 +48,14 @@ model User {
 }
 
 model Child {
-  id        String   @id @default(cuid())
-  userId    String
-  name      String
-  age       Int
-  highScore Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String   @id @default(cuid())
+  bowlerNumber Int      @unique @default(dbgenerated("nextval('bowler_id_seq')"))
+  userId       String
+  name         String
+  age          Int
+  highScore    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   vouchers  Voucher[]
@@ -66,6 +67,7 @@ model Child {
 // Created only after Stripe checkout succeeds.
 model Adult {
   id                    String   @id @default(cuid())
+  bowlerNumber          Int      @unique @default(dbgenerated("nextval('bowler_id_seq')"))
   userId                String
   name                  String
   age                   Int

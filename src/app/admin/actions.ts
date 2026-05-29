@@ -7,6 +7,7 @@ import { sendSms, smsTemplates } from "@/lib/twilio";
 import { todayInProgramTz } from "@/lib/dates";
 import { stripe, FAMILY_PASS_PRICE_CENTS } from "@/lib/stripe";
 import { sendEmail, familyPassActiveEmail } from "@/lib/email";
+import { postToFbtReceiver } from "@/lib/fbt-export";
 
 export async function redeemVoucher(voucherId: string, gamesBowled: number = 2) {
   const session = await requireAdmin();
@@ -83,6 +84,17 @@ export async function addChildToFamily(input: {
       select: { id: true },
     });
   }
+
+  // Auto-POST to FBT receiver so the new kid lands in Conqueror
+  postToFbtReceiver([
+    {
+      bowlerNumber: child.bowlerNumber,
+      name: child.name,
+      registeredAt: child.createdAt,
+      kind: "child" as const,
+      age: child.age,
+    },
+  ]).catch((err) => console.error("[admin/addChild] FBT POST failed:", err));
 
   revalidatePath(`/admin/families/${input.userId}`);
   revalidatePath("/admin/families");
@@ -174,6 +186,44 @@ export async function generateTodayVouchers(opts: { sendSms: boolean } = { sendS
   return { families: users.length, vouchersCreated, smsQueued, smsFailed };
 }
 
+// Force-resend ALL existing bowlers to the FBT receiver. Use after the WP
+// receiver is first deployed, or to recover from a long Manor Lanes outage.
+export async function resyncAllBowlersToFbt() {
+  const session = await requireAdmin();
+  if (!session) throw new Error("Unauthorized");
+
+  const [kids, adults] = await Promise.all([
+    prisma.child.findMany({
+      orderBy: { bowlerNumber: "asc" },
+      select: { bowlerNumber: true, name: true, age: true, createdAt: true },
+    }),
+    prisma.adult.findMany({
+      orderBy: { bowlerNumber: "asc" },
+      select: { bowlerNumber: true, name: true, age: true, createdAt: true },
+    }),
+  ]);
+
+  const bowlers = [
+    ...kids.map((c) => ({
+      bowlerNumber: c.bowlerNumber,
+      name: c.name,
+      registeredAt: c.createdAt,
+      kind: "child" as const,
+      age: c.age,
+    })),
+    ...adults.map((a) => ({
+      bowlerNumber: a.bowlerNumber,
+      name: a.name,
+      registeredAt: a.createdAt,
+      kind: "adult" as const,
+      age: a.age,
+    })),
+  ];
+
+  await postToFbtReceiver(bowlers);
+  return { ok: true, posted: bowlers.length };
+}
+
 // Fallback for stuck PendingAdults. Looks up the Stripe Checkout Session by
 // id, verifies payment_status = 'paid' from Stripe's API directly, and if
 // paid, promotes all PendingAdult rows for that session into Adult rows and
@@ -216,9 +266,10 @@ export async function verifyAndPromotePendingAdult(pendingId: string) {
       : stripeSession.payment_intent?.id ?? null;
   const paidAt = new Date();
 
+  const promoted: { bowlerNumber: number; name: string; age: number; createdAt: Date }[] = [];
   await prisma.$transaction(async (tx) => {
     for (const p of allPending) {
-      await tx.adult.create({
+      const a = await tx.adult.create({
         data: {
           userId: p.userId,
           name: p.name,
@@ -229,12 +280,25 @@ export async function verifyAndPromotePendingAdult(pendingId: string) {
           paidAt,
           programYear: p.programYear,
         },
+        select: { bowlerNumber: true, name: true, age: true, createdAt: true },
       });
+      promoted.push(a);
     }
     await tx.pendingAdult.deleteMany({
       where: { stripeSessionId: pending.stripeSessionId },
     });
   });
+
+  // Auto-POST the verified-paid adults to the FBT receiver
+  postToFbtReceiver(
+    promoted.map((a) => ({
+      bowlerNumber: a.bowlerNumber,
+      name: a.name,
+      registeredAt: a.createdAt,
+      kind: "adult" as const,
+      age: a.age,
+    }))
+  ).catch((err) => console.error("[verifyPending] FBT POST failed:", err));
 
   // Send the Family Pass active email (same as webhook would have)
   const totalDollars = `$${((allPending.length * FAMILY_PASS_PRICE_CENTS) / 100).toFixed(2)}`;

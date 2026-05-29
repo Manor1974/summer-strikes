@@ -48,6 +48,10 @@ type Feed = {
   currently_open?: boolean;
 };
 
+// If the poller hasn't updated the feed in this many minutes, we treat
+// the data as untrustworthy and show "unavailable" instead of stale info.
+const STALE_THRESHOLD_MIN = 10;
+
 export async function getLaneStatus(): Promise<LaneStatus> {
   try {
     const res = await fetch(FEED_URL, {
@@ -63,6 +67,12 @@ export async function getLaneStatus(): Promise<LaneStatus> {
       return { status: "unknown" };
     }
     const updatedAt = feed.updated_at ?? new Date().toISOString();
+    // Reject stale data — if FRONTDESK1's poller is down, show "unavailable"
+    // rather than a fake 12-hour-old lane count.
+    const ageMs = Date.now() - new Date(updatedAt).getTime();
+    if (Number.isFinite(ageMs) && ageMs > STALE_THRESHOLD_MIN * 60 * 1000) {
+      return { status: "unknown" };
+    }
     if (!feed.currently_open) {
       return { status: "closed_now", updatedAt };
     }

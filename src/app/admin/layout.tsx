@@ -25,6 +25,9 @@ export default async function AdminLayout({
           <Link href="/admin/families" className="text-xs opacity-70 hover:opacity-100">
             Families
           </Link>
+          <Link href="/admin/reservations" className="text-xs opacity-70 hover:opacity-100">
+            Reservations
+          </Link>
           <Link href="/admin/sms" className="text-xs opacity-70 hover:opacity-100">
             SMS
           </Link>

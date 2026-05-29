@@ -17,6 +17,13 @@ enum Role {
   STAFF
 }
 
+enum ReservationStatus {
+  REQUESTED
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
 model User {
   id                  String    @id @default(cuid())
   email               String    @unique
@@ -41,6 +48,7 @@ model User {
   adults              Adult[]
   vouchers            Voucher[]
   pendingAdults       PendingAdult[]
+  reservations        Reservation[]
   sessions            Session[]
   accounts            Account[]
 
@@ -103,6 +111,27 @@ model PendingAdult {
   user            User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([stripeSessionId])
+}
+
+model Reservation {
+  id              String            @id @default(cuid())
+  userId          String
+  reservationDate DateTime          @db.Date
+  startTime       String            // "17:00" HH:MM
+  partySize       Int
+  notes           String?
+  status          ReservationStatus @default(REQUESTED)
+  laneNumber      Int?
+  confirmedAt     DateTime?
+  confirmedBy     String?
+  cancelledAt     DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([reservationDate, status])
 }
 
 model Voucher {

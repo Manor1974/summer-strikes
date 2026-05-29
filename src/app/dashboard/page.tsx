@@ -29,6 +29,16 @@ export default async function DashboardPage() {
 
   if (!user) redirect("/login");
 
+  // Upcoming reservations (today + future, not cancelled/completed)
+  const upcomingReservations = await prisma.reservation.findMany({
+    where: {
+      userId,
+      reservationDate: { gte: dateOnly },
+      status: { in: ["REQUESTED", "CONFIRMED"] },
+    },
+    orderBy: [{ reservationDate: "asc" }, { startTime: "asc" }],
+  });
+
   const redeemedVouchers = await prisma.voucher.findMany({
     where: { userId, redeemedAt: { not: null } },
     select: {
@@ -155,7 +165,7 @@ export default async function DashboardPage() {
         </span>
       </div>
 
-      {/* Reservation code — enter on the online reservation system to skip checkout */}
+      {/* Reservation code + Reserve a lane action */}
       {user.reservationCode && (
         <div className="mt-3 flex items-center justify-between gap-3 rounded-2xl border border-sl-gold/30 bg-sl-gold/10 px-4 py-3">
           <div>
@@ -166,11 +176,59 @@ export default async function DashboardPage() {
               {user.reservationCode}
             </p>
           </div>
-          <p className="max-w-[180px] text-right text-[11px] text-sl-navy/70">
-            Enter this code online when you reserve a lane &mdash; no payment, no
-            checkout.
-          </p>
+          <Link
+            href="/dashboard/reserve"
+            className="rounded-md bg-sl-navy px-4 py-2.5 text-sm font-medium text-white hover:bg-sl-navy-light"
+          >
+            Reserve a lane →
+          </Link>
         </div>
+      )}
+
+      {/* Upcoming reservations */}
+      {upcomingReservations.length > 0 && (
+        <>
+          <SectionLabel>Upcoming reservations</SectionLabel>
+          <div className="space-y-2">
+            {upcomingReservations.map((r) => (
+              <div
+                key={r.id}
+                className="flex items-center justify-between gap-3 rounded-2xl border border-black/5 bg-white px-4 py-3 shadow-sm"
+              >
+                <div>
+                  <p className="text-sm font-medium text-sl-navy">
+                    {new Intl.DateTimeFormat("en-US", {
+                      weekday: "short",
+                      month: "short",
+                      day: "numeric",
+                    }).format(r.reservationDate)}{" "}
+                    at{" "}
+                    {(() => {
+                      const [h, m] = r.startTime.split(":").map(Number);
+                      const period = h >= 12 ? "PM" : "AM";
+                      const display = h === 0 ? 12 : h > 12 ? h - 12 : h;
+                      return `${display}:${String(m).padStart(2, "0")} ${period}`;
+                    })()}
+                  </p>
+                  <p className="mt-0.5 text-xs text-sl-navy/60">
+                    Party of {r.partySize}
+                    {r.status === "CONFIRMED" && r.laneNumber ? ` · Lane ${r.laneNumber}` : ""}
+                    {r.status === "REQUESTED" ? " · Pending confirmation" : ""}
+                  </p>
+                </div>
+                <span
+                  className={`rounded-full px-3 py-1 text-[11px] font-medium ${
+                    r.status === "CONFIRMED"
+                      ? "bg-[#EAF3DE] text-[#3B6D11]"
+                      : "bg-sl-gold/20 text-sl-gold"
+                  }`}
+                >
+                  {r.status === "CONFIRMED" ? "Confirmed" : "Pending"}
+                </span>
+              </div>
+            ))}
+          </div>
+        </>
       )}
 
       {/* Stats row */}

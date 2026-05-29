@@ -2,17 +2,23 @@
 // Built with table-based layout + inline CSS for Outlook / Gmail / Apple Mail
 // compatibility. Width capped at 600px which is the email standard.
 
-export function announcementEmail(opts: { registerUrl: string }) {
-  const { registerUrl } = opts;
+export function announcementEmail(opts: {
+  registerUrl: string;
+  schedule?: { day: string; hours: string | null }[];
+  logoUrl?: string;
+}) {
+  const { registerUrl, schedule, logoUrl } = opts;
   const navy = "#1a2744";
   const red = "#c8102e";
   const gold = "#f5a623";
   const cream = "#fdfbf7";
   const light = "#f8f6f2";
 
-  const subject = "Summer Strikes is back — your kids bowl free all summer";
+  const subject = "Introducing Summer Strikes at Manor Lanes — your kids bowl free all summer";
 
-  const text = `Summer Strikes is back at Manor Lanes — free bowling all summer for your kids.
+  const hours = schedule ?? DEFAULT_SCHEDULE;
+
+  const text = `New this summer at Manor Lanes — free bowling all summer for your kids.
 
 Register your kids (ages 2-15) for 2 free games of bowling every program day, June 1 through August 31.
 Adults 16+ can join with a Family Pass for $49.95/person — also 2 free games per day, all summer.
@@ -23,12 +29,7 @@ How it works:
   3. Show your phone at the desk and bowl
 
 Program hours:
-  Tuesday    11am – 5pm
-  Wednesday  11am – 5pm
-  Thursday   11am – 10pm
-  Friday     4pm – 6pm
-  Saturday   11am – 5pm
-  (closed Mon & Sun)
+${hours.map((h) => `  ${h.day.padEnd(10)} ${h.hours ?? "closed for Summer Strikes"}`).join("\n")}
 
 Standard shoe rental fees still apply.
 
@@ -37,13 +38,21 @@ Register now: ${registerUrl}
 — Manor Lanes
 `;
 
+  const logoBlock = logoUrl
+    ? `<tr>
+        <td style="padding:24px 16px 0;text-align:center;">
+          <img src="${logoUrl}" alt="Manor Lanes" height="48" style="height:48px;width:auto;display:inline-block;border:0;" />
+        </td>
+      </tr>`
+    : "";
+
   const html = `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="x-apple-disable-message-reformatting" />
-<title>Summer Strikes is back at Manor Lanes</title>
+<title>Introducing Summer Strikes at Manor Lanes</title>
 </head>
 <body style="margin:0;padding:0;background:${cream};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:${navy};">
 <center style="width:100%;background:${cream};">
@@ -56,8 +65,10 @@ Register now: ${registerUrl}
     </td>
   </tr>
 
+  ${logoBlock}
+
   <!-- Spacer -->
-  <tr><td style="padding:24px 16px 0;"></td></tr>
+  <tr><td style="padding:${logoBlock ? "16px" : "24px"} 16px 0;"></td></tr>
 
   <!-- Hero -->
   <tr>
@@ -66,15 +77,17 @@ Register now: ${registerUrl}
         <tr>
           <td style="padding:32px 28px 32px;color:#ffffff;">
             <div style="display:inline-block;background:${red};color:#ffffff;font-size:11px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;padding:4px 12px;border-radius:20px;">
-              Manor Lanes &middot; Summer 2026
+              Manor Lanes &middot; New for Summer 2026
             </div>
             <h1 style="margin:14px 0 8px;font-size:30px;line-height:1.15;font-weight:500;color:#ffffff;">
               Summer <span style="color:${gold};">Strikes</span><br/>
               Bowl Free All Summer
             </h1>
             <p style="margin:8px 0 22px;font-size:15px;line-height:1.5;color:#ffffff;opacity:0.85;">
-              Register your kids (ages 2–15) for 2 free games of bowling every program day &mdash; all summer long.
-              Add adults 16+ with the Family Pass for $49.95/person.
+              We&rsquo;re launching a new free summer bowling program for kids.
+              Register your kids ages 2&ndash;15 for 2 free games of bowling
+              every program day &mdash; all summer long. Add adults 16+ with the
+              Family Pass for $49.95/person.
             </p>
             <table role="presentation" cellspacing="0" cellpadding="0" border="0">
               <tr>
@@ -171,16 +184,15 @@ Register now: ${registerUrl}
       <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background:#ffffff;border:1px solid rgba(0,0,0,0.06);border-radius:14px;">
         <tr><td style="padding:18px;">
           <p style="margin:0 0 12px;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:${navy};opacity:0.6;">
-            Available times
+            Program hours
           </p>
           <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="font-size:14px;">
-            <tr><td style="padding:5px 0;color:${navy};opacity:0.6;border-bottom:1px solid rgba(0,0,0,0.05);">Monday</td><td style="padding:5px 0;text-align:right;color:${navy};opacity:0.4;border-bottom:1px solid rgba(0,0,0,0.05);">Not available</td></tr>
-            <tr><td style="padding:5px 0;color:${navy};opacity:0.6;border-bottom:1px solid rgba(0,0,0,0.05);">Tuesday</td><td style="padding:5px 0;text-align:right;color:${navy};border-bottom:1px solid rgba(0,0,0,0.05);">11:00am – 5:00pm</td></tr>
-            <tr><td style="padding:5px 0;color:${navy};opacity:0.6;border-bottom:1px solid rgba(0,0,0,0.05);">Wednesday</td><td style="padding:5px 0;text-align:right;color:${navy};border-bottom:1px solid rgba(0,0,0,0.05);">11:00am – 5:00pm</td></tr>
-            <tr><td style="padding:5px 0;color:${navy};opacity:0.6;border-bottom:1px solid rgba(0,0,0,0.05);">Thursday</td><td style="padding:5px 0;text-align:right;color:${navy};border-bottom:1px solid rgba(0,0,0,0.05);">11:00am – 10:00pm</td></tr>
-            <tr><td style="padding:5px 0;color:${navy};opacity:0.6;border-bottom:1px solid rgba(0,0,0,0.05);">Friday</td><td style="padding:5px 0;text-align:right;color:${navy};border-bottom:1px solid rgba(0,0,0,0.05);">4:00pm – 6:00pm</td></tr>
-            <tr><td style="padding:5px 0;color:${navy};opacity:0.6;border-bottom:1px solid rgba(0,0,0,0.05);">Saturday</td><td style="padding:5px 0;text-align:right;color:${navy};border-bottom:1px solid rgba(0,0,0,0.05);">11:00am – 5:00pm</td></tr>
-            <tr><td style="padding:5px 0;color:${navy};opacity:0.6;">Sunday</td><td style="padding:5px 0;text-align:right;color:${navy};opacity:0.4;">Not available</td></tr>
+            ${hours
+              .map(
+                (h, i) =>
+                  `<tr><td style="padding:5px 0;color:${navy};opacity:0.6;${i < hours.length - 1 ? `border-bottom:1px solid rgba(0,0,0,0.05);` : ""}">${h.day}</td><td style="padding:5px 0;text-align:right;color:${navy};${h.hours ? "" : "opacity:0.4;"}${i < hours.length - 1 ? `border-bottom:1px solid rgba(0,0,0,0.05);` : ""}">${h.hours ?? "Closed for Summer Strikes"}</td></tr>`
+              )
+              .join("")}
           </table>
         </td></tr>
       </table>
@@ -228,3 +240,13 @@ Register now: ${registerUrl}
 
   return { subject, html, text };
 }
+
+const DEFAULT_SCHEDULE = [
+  { day: "Monday", hours: null },
+  { day: "Tuesday", hours: "11:00am – 5:00pm" },
+  { day: "Wednesday", hours: "11:00am – 5:00pm" },
+  { day: "Thursday", hours: "11:00am – 10:00pm" },
+  { day: "Friday", hours: "4:00pm – 6:00pm" },
+  { day: "Saturday", hours: "11:00am – 5:00pm" },
+  { day: "Sunday", hours: null },
+];

@@ -209,6 +209,98 @@ export async function verifyAndPromotePendingAdult(pendingId: string) {
   };
 }
 
+type StaffAccountInput = {
+  email: string;
+  firstName: string;
+  lastName: string;
+  password: string;
+  role: "ADMIN" | "STAFF";
+};
+
+export async function createStaffAccount(input: StaffAccountInput) {
+  const session = await requireAdmin();
+  if (!session) throw new Error("Unauthorized");
+
+  const email = input.email.trim().toLowerCase();
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+    throw new Error("Invalid email format");
+  }
+  if (!input.firstName.trim() || !input.lastName.trim()) {
+    throw new Error("First and last name are required");
+  }
+  if (input.password.length < 6) {
+    throw new Error("Password must be at least 6 characters");
+  }
+  if (input.role !== "ADMIN" && input.role !== "STAFF") {
+    throw new Error("Role must be ADMIN or STAFF");
+  }
+
+  const existing = await prisma.user.findUnique({ where: { email } });
+  if (existing) {
+    throw new Error(
+      `${email} already exists (role: ${existing.role}). Use 'Change role' below instead.`
+    );
+  }
+
+  // Lazy-import bcrypt to keep cold starts fast for the other actions.
+  const bcrypt = (await import("bcryptjs")).default;
+  const passwordHash = await bcrypt.hash(input.password, 12);
+
+  await prisma.user.create({
+    data: {
+      email,
+      passwordHash,
+      firstName: input.firstName.trim(),
+      lastName: input.lastName.trim(),
+      role: input.role,
+      // Required fields on User — staff accounts don't have a real address;
+      // we stash a marker so admin views can distinguish them from families.
+      address: "(staff account)",
+      city: "(staff)",
+      state: "NY",
+      zip: "00000",
+      termsAcceptedAt: new Date(),
+    },
+  });
+
+  revalidatePath("/admin/staff");
+  return { ok: true, email };
+}
+
+export async function changeUserRole(
+  userId: string,
+  role: "PARENT" | "ADMIN" | "STAFF"
+) {
+  const session = await requireAdmin();
+  if (!session) throw new Error("Unauthorized");
+
+  // Don't allow demoting yourself by accident
+  const me = await prisma.user.findUnique({
+    where: { email: session.user.email!.toLowerCase() },
+    select: { id: true },
+  });
+  if (me?.id === userId && role === "PARENT") {
+    throw new Error("Refusing to demote yourself. Ask another admin.");
+  }
+
+  await prisma.user.update({ where: { id: userId }, data: { role } });
+  revalidatePath("/admin/staff");
+  return { ok: true };
+}
+
+export async function resetUserPassword(userId: string, newPassword: string) {
+  const session = await requireAdmin();
+  if (!session) throw new Error("Unauthorized");
+  if (newPassword.length < 6) throw new Error("Password must be at least 6 characters");
+
+  const bcrypt = (await import("bcryptjs")).default;
+  const passwordHash = await bcrypt.hash(newPassword, 12);
+  await prisma.user.update({ where: { id: userId }, data: { passwordHash } });
+  revalidatePath("/admin/staff");
+  revalidatePath("/admin/families");
+  return { ok: true };
+}
+
 export async function broadcastSms(message: string) {
   const session = await requireAdmin();
   if (!session) throw new Error("Unauthorized");

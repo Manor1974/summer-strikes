@@ -129,19 +129,26 @@ export default async function DashboardPage() {
 
       {/* Lane availability pill — neutral gray for readability; the colored dot signals status */}
       <div className="mt-4 rounded-2xl bg-sl-navy/[0.06] px-4 py-3 text-sm text-sl-navy">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-start gap-2">
             <span
-              className={`inline-block h-2 w-2 flex-shrink-0 rounded-full ${laneDotClass[laneLabel.tone]}`}
+              className={`mt-[6px] inline-block h-2 w-2 flex-shrink-0 rounded-full ${laneDotClass[laneLabel.tone]}`}
             ></span>
-            <span className="font-medium">{laneLabel.text}</span>
+            <div>
+              <div className="font-medium">{laneLabel.text}</div>
+              {laneLabel.detail && (
+                <div className="mt-0.5 text-[13px] text-sl-navy/75">
+                  {laneLabel.detail}
+                </div>
+              )}
+            </div>
           </div>
           <span className="text-[10px] uppercase tracking-wider text-sl-navy/40">
             Live
           </span>
         </div>
         {laneLabel.sub && (
-          <p className="mt-1 text-[11px] text-sl-navy/60">{laneLabel.sub}</p>
+          <p className="mt-1 pl-4 text-[11px] text-sl-navy/60">{laneLabel.sub}</p>
         )}
       </div>
 

@@ -204,23 +204,30 @@ export async function getLaneStatus(): Promise<LaneStatus> {
 // Pretty-printer for the dashboard pill. The dashboard renders a neutral
 // gray pill — the tone here drives just the small status dot, not the
 // background.
+//
+// Three vertical slots:
+//   text   — primary line, always shown
+//   detail — secondary line (e.g., live lane count), optional
+//   sub    — tiny meta line (e.g., "updated just now"), optional
 export function laneStatusLabel(s: LaneStatus): {
   text: string;
+  detail: string | null;
   sub: string | null;
   tone: "green" | "amber" | "red" | "gray";
 } {
   if (s.status === "open_now") {
     const tone: "green" | "amber" = s.lanesOpen === 0 ? "amber" : "green";
-    const base = `We have open lanes today from ${s.opensAt} until ${s.closesAt}`;
-    const text =
+    const text = `We have open lanes today from ${s.opensAt} until ${s.closesAt}`;
+    const detail =
       s.lanesOpen === 0
-        ? `${base} · no lanes free right now`
-        : `${base} · ${s.lanesOpen} of ${s.lanesTotal} lane${s.lanesTotal === 1 ? "" : "s"} available now`;
-    return { text, sub: relativeAgo(s.updatedAt), tone };
+        ? "No lanes free right now"
+        : `${s.lanesOpen} of ${s.lanesTotal} lane${s.lanesTotal === 1 ? "" : "s"} available now`;
+    return { text, detail, sub: relativeAgo(s.updatedAt), tone };
   }
   if (s.status === "opens_later_today") {
     return {
       text: `We have open lanes today from ${s.opensAt} until ${s.closesAt}`,
+      detail: null,
       sub: null,
       tone: "green",
     };
@@ -230,12 +237,14 @@ export function laneStatusLabel(s: LaneStatus): {
       text: s.nextOpenLabel
         ? `Closed today · opens ${s.nextOpenLabel}`
         : "Closed for Summer Strikes today",
+      detail: null,
       sub: null,
       tone: "red",
     };
   }
   return {
     text: "Lane availability unavailable",
+    detail: null,
     sub: "updates every 5 min",
     tone: "gray",
   };

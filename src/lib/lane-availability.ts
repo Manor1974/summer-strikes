@@ -23,10 +23,11 @@ export type LaneStatus =
       status: "open_now";
       lanesOpen: number;
       lanesTotal: number;
-      closesAt: string | null;
+      opensAt: string;
+      closesAt: string;
       updatedAt: string;
     }
-  | { status: "opens_later_today"; opensAt: string }
+  | { status: "opens_later_today"; opensAt: string; closesAt: string }
   | { status: "closed_today"; nextOpenLabel: string | null }
   | { status: "unknown" };
 
@@ -152,7 +153,11 @@ export async function getLaneStatus(): Promise<LaneStatus> {
   }
   const nowMins = et.hour * 60 + et.minute;
   if (nowMins < window.openMins) {
-    return { status: "opens_later_today", opensAt: window.openLabel };
+    return {
+      status: "opens_later_today",
+      opensAt: window.openLabel,
+      closesAt: window.closeLabel,
+    };
   }
   if (nowMins >= window.closeMins) {
     return { status: "closed_today", nextOpenLabel: null };
@@ -179,6 +184,7 @@ export async function getLaneStatus(): Promise<LaneStatus> {
       status: "open_now",
       lanesOpen: feed.lanes_available_now,
       lanesTotal: feed.lanes_total ?? 24,
+      opensAt: window.openLabel,
       closesAt: window.closeLabel,
       updatedAt,
     };
@@ -187,27 +193,28 @@ export async function getLaneStatus(): Promise<LaneStatus> {
   }
 }
 
-// Pretty-printer for the dashboard pill.
+// Pretty-printer for the dashboard pill. The dashboard renders a neutral
+// gray pill — the tone here drives just the small status dot, not the
+// background.
 export function laneStatusLabel(s: LaneStatus): {
   text: string;
   sub: string | null;
   tone: "green" | "amber" | "red" | "gray";
 } {
   if (s.status === "open_now") {
-    const tone: "green" | "amber" =
-      s.lanesOpen === 0 ? "amber" : "green";
-    const openUntil = s.closesAt ? `We're open until ${s.closesAt}` : "We're open now";
+    const tone: "green" | "amber" = s.lanesOpen === 0 ? "amber" : "green";
+    const base = `We have open lanes today from ${s.opensAt} until ${s.closesAt}`;
     const text =
       s.lanesOpen === 0
-        ? `${openUntil} · no lanes free right now`
-        : `${openUntil} · ${s.lanesOpen} of ${s.lanesTotal} lane${s.lanesTotal === 1 ? "" : "s"} available`;
+        ? `${base} · no lanes free right now`
+        : `${base} · ${s.lanesOpen} of ${s.lanesTotal} lane${s.lanesTotal === 1 ? "" : "s"} available now`;
     return { text, sub: relativeAgo(s.updatedAt), tone };
   }
   if (s.status === "opens_later_today") {
     return {
-      text: `Closed right now · opens today at ${s.opensAt}`,
+      text: `We have open lanes today from ${s.opensAt} until ${s.closesAt}`,
       sub: null,
-      tone: "amber",
+      tone: "green",
     };
   }
   if (s.status === "closed_today") {

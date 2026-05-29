@@ -89,14 +89,15 @@ export default async function DashboardPage() {
   const initials = `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
   const totalEnrolled = user.children.length + user.adults.length;
 
-  // Live lane availability from QubicaAMF — cached for 5 min.
+  // Live lane availability — gated by program-hours.ts (open status) and
+  // Manor Lanes' poller feed (lane count). 30s cache.
   const laneStatus = await getLaneStatus();
   const laneLabel = laneStatusLabel(laneStatus);
-  const laneToneClass: Record<typeof laneLabel.tone, string> = {
-    green: "bg-[#EAF3DE] text-[#3B6D11]",
-    amber: "bg-sl-gold/15 text-sl-gold",
-    red: "bg-sl-red/10 text-sl-red",
-    gray: "bg-sl-light text-sl-navy/60",
+  const laneDotClass: Record<typeof laneLabel.tone, string> = {
+    green: "bg-[#3B6D11] animate-pulse",
+    amber: "bg-sl-gold",
+    red: "bg-sl-red",
+    gray: "bg-sl-navy/40",
   };
 
   return (
@@ -126,19 +127,21 @@ export default async function DashboardPage() {
         }
       />
 
-      {/* Lane availability pill — live from Manor Lanes' lane poller */}
-      <div className={`mt-4 rounded-2xl px-4 py-3 text-sm ${laneToneClass[laneLabel.tone]}`}>
+      {/* Lane availability pill — neutral gray for readability; the colored dot signals status */}
+      <div className="mt-4 rounded-2xl bg-sl-navy/[0.06] px-4 py-3 text-sm text-sl-navy">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <span
-              className={`inline-block h-2 w-2 rounded-full ${laneLabel.tone === "green" ? "bg-[#3B6D11] animate-pulse" : laneLabel.tone === "amber" ? "bg-sl-gold" : laneLabel.tone === "red" ? "bg-sl-red" : "bg-sl-navy/40"}`}
+              className={`inline-block h-2 w-2 flex-shrink-0 rounded-full ${laneDotClass[laneLabel.tone]}`}
             ></span>
             <span className="font-medium">{laneLabel.text}</span>
           </div>
-          <span className="text-[10px] uppercase tracking-wider opacity-60">Live</span>
+          <span className="text-[10px] uppercase tracking-wider text-sl-navy/40">
+            Live
+          </span>
         </div>
         {laneLabel.sub && (
-          <p className="mt-1 text-[11px] opacity-70">{laneLabel.sub}</p>
+          <p className="mt-1 text-[11px] text-sl-navy/60">{laneLabel.sub}</p>
         )}
       </div>
 

@@ -1,14 +1,11 @@
 import Link from "next/link";
+import { PROGRAM_HOURS_BASE } from "@/lib/program-hours";
 
-const SCHEDULE: { day: string; hours: string; closed?: boolean }[] = [
-  { day: "Monday", hours: "Not available", closed: true },
-  { day: "Tuesday", hours: "11:00am – 5:00pm" },
-  { day: "Wednesday", hours: "11:00am – 5:00pm" },
-  { day: "Thursday", hours: "11:00am – 10:00pm" },
-  { day: "Friday", hours: "4:00pm – 6:00pm" },
-  { day: "Saturday", hours: "11:00am – 5:00pm" },
-  { day: "Sunday", hours: "Not available", closed: true },
-];
+const SCHEDULE = PROGRAM_HOURS_BASE.map((d) => ({
+  day: d.day,
+  hours: d.hours ?? "Closed",
+  closed: !d.hours,
+}));
 
 export default function LandingPage() {
   return (

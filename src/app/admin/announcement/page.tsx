@@ -1,6 +1,7 @@
 import { announcementEmail } from "@/lib/announcement-email";
 import { appBaseUrl } from "@/lib/stripe";
 import { requireAdmin } from "@/lib/admin";
+import { PROGRAM_HOURS_BASE } from "@/lib/program-hours";
 import AnnouncementClient from "./client";
 
 export const dynamic = "force-dynamic";
@@ -8,7 +9,11 @@ export const dynamic = "force-dynamic";
 export default async function AnnouncementPage() {
   const session = await requireAdmin();
   const baseUrl = appBaseUrl();
-  const email = announcementEmail({ registerUrl: `${baseUrl}/register` });
+  const email = announcementEmail({
+    registerUrl: `${baseUrl}/register`,
+    schedule: PROGRAM_HOURS_BASE,
+    logoUrl: `${baseUrl}/manor-lanes-logo.png`,
+  });
 
   return (
     <>

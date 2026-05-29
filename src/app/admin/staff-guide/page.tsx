@@ -84,23 +84,27 @@ export default function StaffGuidePage() {
           <table className="mt-2 w-full text-sm">
             <tbody>
               {[
-                ["Monday", null],
-                ["Tuesday", "11:00am – 5:00pm"],
-                ["Wednesday", "11:00am – 5:00pm"],
-                ["Thursday", "11:00am – 10:00pm"],
-                ["Friday", "4:00pm – 6:00pm"],
-                ["Saturday", "11:00am – 5:00pm"],
+                ["Monday", "5:00pm – 11:00pm"],
+                ["Tuesday", "5:00pm – 11:00pm"],
+                ["Wednesday", "5:00pm – 11:00pm"],
+                ["Thursday", "5:00pm – 11:00pm"],
+                ["Friday", "5:00pm – 11:00pm"],
+                ["Saturday", "5:00pm – 11:00pm · every other Sat"],
                 ["Sunday", null],
               ].map(([day, hours]) => (
                 <tr key={day} className="border-b border-sl-navy/10 last:border-0">
                   <td className="py-1.5 font-medium">{day}</td>
                   <td className="py-1.5 text-right">
-                    {hours ?? <span className="text-sl-navy/40">closed for Summer Strikes</span>}
+                    {hours ?? <span className="text-sl-navy/40">closed</span>}
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+          <p className="mt-2 text-[11px] text-sl-navy/60">
+            Open Saturdays starting May 30, 2026: May 30, Jun 13, Jun 27,
+            Jul 11, Jul 25, Aug 8, Aug 22.
+          </p>
         </section>
 
         {/* How to redeem */}
@@ -224,12 +228,21 @@ export default function StaffGuidePage() {
             </div>
             <div>
               <dt className="font-bold">
-                &ldquo;Can I bowl on Mondays or Sundays?&rdquo;
+                &ldquo;Can I bowl on Sundays?&rdquo;
               </dt>
               <dd className="mt-0.5 pl-1">
-                Not as part of Summer Strikes &mdash; we&apos;re closed for
-                the program those days. Normal lane pricing still applies if
-                they want to bowl.
+                No &mdash; Manor Lanes is closed on Sundays for Summer Strikes.
+              </dd>
+            </div>
+            <div>
+              <dt className="font-bold">
+                &ldquo;Is this Saturday open?&rdquo;
+              </dt>
+              <dd className="mt-0.5 pl-1">
+                Saturdays alternate. Open Saturdays starting May 30, 2026 are:
+                <strong>&nbsp;May 30, Jun 13, Jun 27, Jul 11, Jul 25, Aug 8,
+                Aug 22</strong>. If you&apos;re unsure, check the dashboard
+                &mdash; it shows the live availability.
               </dd>
             </div>
             <div>

@@ -4,14 +4,22 @@ import { requireAdmin } from "@/lib/admin";
 import { sendEmail } from "@/lib/email";
 import { announcementEmail } from "@/lib/announcement-email";
 import { appBaseUrl } from "@/lib/stripe";
+import { PROGRAM_HOURS_BASE } from "@/lib/program-hours";
+
+function buildEmail() {
+  const baseUrl = appBaseUrl();
+  return announcementEmail({
+    registerUrl: `${baseUrl}/register`,
+    schedule: PROGRAM_HOURS_BASE,
+    logoUrl: `${baseUrl}/manor-lanes-logo.png`,
+  });
+}
 
 export async function sendAnnouncementTest() {
   const session = await requireAdmin();
   if (!session?.user?.email) throw new Error("Unauthorized");
 
-  const { subject, html, text } = announcementEmail({
-    registerUrl: `${appBaseUrl()}/register`,
-  });
+  const { subject, html, text } = buildEmail();
   await sendEmail({ to: session.user.email, subject, html, text });
   return { ok: true };
 }
@@ -31,9 +39,7 @@ export async function broadcastAnnouncement(rawRecipients: string[]) {
 
   if (emails.length === 0) return { sent: 0, failed: 0, total: 0 };
 
-  const { subject, html, text } = announcementEmail({
-    registerUrl: `${appBaseUrl()}/register`,
-  });
+  const { subject, html, text } = buildEmail();
 
   let sent = 0;
   let failed = 0;

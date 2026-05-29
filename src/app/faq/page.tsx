@@ -50,11 +50,15 @@ const FAQS: { category: string; items: FaqItem[] }[] = [
     items: [
       {
         q: "When can my kids bowl?",
-        a: "Tuesday, Wednesday, Saturday: 11am–5pm. Thursday: 11am–10pm. Friday: 4–6pm. We're closed for Summer Strikes on Monday and Sunday.",
+        a: "Monday through Friday: 5pm–11pm. Saturdays: every other Saturday 5pm–11pm, starting May 30, 2026 (May 30, June 13, June 27, July 11, July 25, August 8, August 22). We're closed for Summer Strikes on Sundays.",
       },
       {
         q: "When does the program run?",
         a: "Summer Strikes runs June 1 through August 31. Vouchers will be available every program day during that window.",
+      },
+      {
+        q: "How do I know if lanes are open right now?",
+        a: "Your dashboard shows a live availability badge powered by Manor Lanes' lane management system — refreshes every 5 minutes. You'll see how many lanes are open the moment you log in.",
       },
     ],
   },

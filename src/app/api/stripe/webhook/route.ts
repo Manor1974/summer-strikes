@@ -68,7 +68,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       : session.payment_intent?.id ?? null;
 
   // Promote each pending adult into an Adult row.
-  const promoted: { bowlerNumber: number; name: string; age: number; createdAt: Date }[] = [];
+  const promoted: { bowlerNumber: number; name: string; age: number | null; createdAt: Date }[] = [];
   await prisma.$transaction(async (tx) => {
     for (const p of pending) {
       const a = await tx.adult.create({

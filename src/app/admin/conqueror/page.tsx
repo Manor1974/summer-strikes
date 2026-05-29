@@ -110,7 +110,7 @@ export default async function ConquerorPage() {
                         {b.kind}
                       </span>
                     </td>
-                    <td className="px-4 py-2 text-sl-navy/70">{b.age}</td>
+                    <td className="px-4 py-2 text-sl-navy/70">{b.age ?? "—"}</td>
                     <td className="px-4 py-2 text-right text-[11px] text-sl-navy/60">
                       {b.createdAt.toLocaleDateString()}
                     </td>

@@ -15,12 +15,12 @@ export default async function AddMemberPage() {
         ← Dashboard
       </Link>
       <h1 className="mt-3 text-xl font-medium text-sl-navy">
-        Add a Family Pass <span className="text-sl-gold">adult</span>
+        Add a Family Pass <span className="text-sl-gold">member</span>
       </h1>
       <p className="mt-1 text-sm text-sl-navy/60">
-        Each adult or older teen (age 16+) gets 2 free games per day during
-        Summer Strikes hours — $49.95 per person, one-time. Kids you&apos;ve
-        already enrolled bowl free.
+        Each additional family member gets 2 free games per day during Summer
+        Strikes hours — $49.95 per person, one-time. Kids you&apos;ve already
+        enrolled bowl free.
       </p>
 
       <AddMemberForm />

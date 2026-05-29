@@ -29,18 +29,16 @@ export default function AddMemberForm() {
     setError(null);
     setSubmitting(true);
 
-    const parsed = adults.map((a) => ({
-      name: a.name.trim(),
-      age: parseInt(a.age, 10),
-    }));
+    const parsed = adults.map((a) => {
+      const ageNum = parseInt(a.age, 10);
+      return {
+        name: a.name.trim(),
+        age: Number.isFinite(ageNum) ? ageNum : undefined,
+      };
+    });
     for (const a of parsed) {
       if (!a.name || a.name.length < 2) {
-        setError("Each adult needs a full name.");
-        setSubmitting(false);
-        return;
-      }
-      if (!Number.isFinite(a.age) || a.age < 16) {
-        setError("Family Pass is for ages 16 and up.");
+        setError("Each member needs a full name.");
         setSubmitting(false);
         return;
       }
@@ -84,11 +82,11 @@ export default function AddMemberForm() {
               />
             </div>
             <div>
-              {i === 0 && <label className="mb-1 block text-xs text-sl-navy/60">Age</label>}
+              {i === 0 && <label className="mb-1 block text-xs text-sl-navy/60">Age (optional)</label>}
               <input
                 value={a.age}
                 onChange={(e) => updateAdult(i, { age: e.target.value })}
-                placeholder="42"
+                placeholder="—"
                 inputMode="numeric"
                 className="h-[34px] w-full rounded-md border border-black/10 bg-sl-light px-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sl-navy/20"
               />

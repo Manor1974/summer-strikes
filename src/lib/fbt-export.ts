@@ -22,7 +22,7 @@ export type FbtBowler = {
   name: string; // full name from registration
   registeredAt: Date;
   kind: "child" | "adult";
-  age?: number;
+  age?: number | null;
 };
 
 // Split a free-text name into first / last. For single-word names, last is empty.

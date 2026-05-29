@@ -3,7 +3,7 @@ import { prisma } from "./prisma";
 import { stripe, FAMILY_PASS_PRICE_CENTS, appBaseUrl } from "./stripe";
 import { programYear } from "./dates";
 
-type AdultInput = { name: string; age: number };
+type AdultInput = { name: string; age?: number | null };
 
 export async function createFamilyPassCheckout({
   userId,

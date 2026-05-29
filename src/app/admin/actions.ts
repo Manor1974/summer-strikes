@@ -266,7 +266,7 @@ export async function verifyAndPromotePendingAdult(pendingId: string) {
       : stripeSession.payment_intent?.id ?? null;
   const paidAt = new Date();
 
-  const promoted: { bowlerNumber: number; name: string; age: number; createdAt: Date }[] = [];
+  const promoted: { bowlerNumber: number; name: string; age: number | null; createdAt: Date }[] = [];
   await prisma.$transaction(async (tx) => {
     for (const p of allPending) {
       const a = await tx.adult.create({

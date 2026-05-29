@@ -71,7 +71,7 @@ model Adult {
   bowlerNumber          Int      @unique @default(dbgenerated("nextval('bowler_id_seq')"))
   userId                String
   name                  String
-  age                   Int
+  age                   Int?
   highScore             Int      @default(0)
   paidAmountCents       Int
   stripeSessionId       String?  @unique
@@ -96,7 +96,7 @@ model PendingAdult {
   userId          String
   stripeSessionId String   @unique
   name            String
-  age             Int
+  age             Int?
   programYear     Int
   createdAt       DateTime @default(now())
 

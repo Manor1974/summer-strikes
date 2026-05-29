@@ -95,7 +95,7 @@ export default async function ShowVouchersPage() {
                   {isAdult && <span className="ml-2 text-sl-gold">FAMILY PASS</span>}
                 </p>
                 <h2 className="mt-2 text-2xl font-medium">{member.name}</h2>
-                <p className="text-sm text-sl-navy/60">Age {member.age}</p>
+                <p className="text-sm text-sl-navy/60">{member.age != null ? `Age ${member.age}` : "Adult"}</p>
 
                 {/* QR code — staff scans this to mark redeemed */}
                 <div className="mt-4 flex justify-center rounded-lg bg-white p-3">

@@ -86,7 +86,8 @@ export default async function RedeemPage({ params }: Params) {
               {member?.name}
             </h1>
             <p className="mt-1 text-sm text-sl-navy/60">
-              Age {member?.age} · {voucher.user.firstName} {voucher.user.lastName}&apos;s family
+              {member?.age != null ? `Age ${member.age} · ` : ""}
+              {voucher.user.firstName} {voucher.user.lastName}&apos;s family
             </p>
 
             <div className="mt-4 rounded-lg bg-sl-light px-4 py-3">

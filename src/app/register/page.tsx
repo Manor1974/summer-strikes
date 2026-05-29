@@ -198,8 +198,8 @@ export default function RegisterPage() {
 
         {/* Adults (Family Pass) */}
         <Section
-          title="Family Pass — adults age 16+"
-          sub={`Optional. Add adults or older teens (16+) to bowl 2 free games per day alongside your kids — $49.95 per person, one-time.`}
+          title="Family Pass — adult members"
+          sub={`Optional. Add additional family members to bowl 2 free games per day alongside your kids — $49.95 per person, one-time.`}
         >
           {adultArray.fields.length === 0 ? (
             <button
@@ -228,12 +228,12 @@ export default function RegisterPage() {
                       />
                     </Field>
                     <Field
-                      label={i === 0 ? "Age" : ""}
+                      label={i === 0 ? "Age (optional)" : ""}
                       error={errors.adults?.[i]?.age?.message}
                     >
                       <input
                         {...register(`adults.${i}.age` as const)}
-                        placeholder="42"
+                        placeholder="—"
                         inputMode="numeric"
                         className={inputCls(!!errors.adults?.[i]?.age)}
                       />

@@ -274,7 +274,7 @@ export default async function DashboardPage() {
                   )}
                 </h4>
                 <p className="text-xs text-sl-navy/60">
-                  Age {m.age} · Bowler ID{" "}
+                  {m.age != null ? `Age ${m.age} · ` : ""}Bowler ID{" "}
                   <span className="font-mono text-sl-navy">
                     {String(m.bowlerNumber).padStart(4, "0")}
                   </span>

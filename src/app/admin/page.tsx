@@ -100,7 +100,9 @@ export default async function AdminTodayPage() {
                           </span>
                         )}
                       </div>
-                      <div className="text-xs text-sl-navy/50">Age {member.age}</div>
+                      <div className="text-xs text-sl-navy/50">
+                        {member.age != null ? `Age ${member.age}` : "Adult"}
+                      </div>
                     </td>
                     <td className="px-4 py-3">
                       <div className="text-sl-navy">

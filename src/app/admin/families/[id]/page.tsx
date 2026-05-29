@@ -137,7 +137,7 @@ export default async function FamilyDetailPage({
                 <div>
                   <p className="text-sm font-medium text-sl-navy">{p.name}</p>
                   <p className="text-xs text-sl-navy/60">
-                    Age {p.age} · session {p.stripeSessionId.slice(-10)} · started {p.createdAt.toLocaleString()}
+                    {p.age != null ? `Age ${p.age} · ` : ""}session {p.stripeSessionId.slice(-10)} · started {p.createdAt.toLocaleString()}
                   </p>
                 </div>
                 <VerifyPendingButton pendingId={p.id} />
@@ -159,7 +159,7 @@ export default async function FamilyDetailPage({
                   <div>
                     <p className="text-sm font-medium text-sl-navy">{a.name}</p>
                     <p className="text-xs text-sl-navy/60">
-                      Age {a.age} · Bowler ID{" "}
+                      {a.age != null ? `Age ${a.age} · ` : ""}Bowler ID{" "}
                       <span className="font-mono text-sl-navy">
                         {String(a.bowlerNumber).padStart(4, "0")}
                       </span>

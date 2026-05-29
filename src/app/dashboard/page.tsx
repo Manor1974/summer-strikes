@@ -4,7 +4,7 @@ import { auth, signOut } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { todayInProgramTz, daysLeftInProgram, isProgramActive } from "@/lib/dates";
 import { BrandHeader } from "@/components/BrandHeader";
-import { getLaneStatus, laneStatusLabel } from "@/lib/qubicaamf";
+import { getLaneStatus, laneStatusLabel } from "@/lib/lane-availability";
 
 export const dynamic = "force-dynamic";
 
@@ -114,15 +114,20 @@ export default async function DashboardPage() {
         }
       />
 
-      {/* Lane availability pill — live from Manor Lanes' QubicaAMF feed */}
-      <div className={`mt-4 flex items-center justify-between gap-3 rounded-2xl px-4 py-2.5 text-sm ${laneToneClass[laneLabel.tone]}`}>
-        <div className="flex items-center gap-2">
-          <span
-            className={`inline-block h-2 w-2 rounded-full ${laneLabel.tone === "green" ? "bg-[#3B6D11]" : laneLabel.tone === "amber" ? "bg-sl-gold" : laneLabel.tone === "red" ? "bg-sl-red" : "bg-sl-navy/40"}`}
-          ></span>
-          <span className="font-medium">{laneLabel.text}</span>
+      {/* Lane availability pill — live from Manor Lanes' lane poller */}
+      <div className={`mt-4 rounded-2xl px-4 py-3 text-sm ${laneToneClass[laneLabel.tone]}`}>
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span
+              className={`inline-block h-2 w-2 rounded-full ${laneLabel.tone === "green" ? "bg-[#3B6D11] animate-pulse" : laneLabel.tone === "amber" ? "bg-sl-gold" : laneLabel.tone === "red" ? "bg-sl-red" : "bg-sl-navy/40"}`}
+            ></span>
+            <span className="font-medium">{laneLabel.text}</span>
+          </div>
+          <span className="text-[10px] uppercase tracking-wider opacity-60">Live</span>
         </div>
-        <span className="text-[10px] uppercase tracking-wider opacity-60">Live</span>
+        {laneLabel.sub && (
+          <p className="mt-1 text-[11px] opacity-70">{laneLabel.sub}</p>
+        )}
       </div>
 
       {/* Family header */}

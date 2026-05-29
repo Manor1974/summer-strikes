@@ -13,24 +13,10 @@ export default function LandingPage() {
     <main className="mx-auto max-w-3xl px-4 py-6 sm:py-10">
       {/* Hero */}
       <section className="relative overflow-hidden rounded-2xl bg-sl-navy px-7 py-10 text-white sm:px-10 sm:py-14">
-        {/* Brand row — Manor Lanes logo + season pill. Logo sits in a white
-            chip so the navy-on-white mark reads against the navy hero bg. */}
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-white p-1.5 shadow-sm sm:h-16 sm:w-16">
-            <Image
-              src="/manor-lanes-logo.svg"
-              alt="Manor Lanes"
-              width={64}
-              height={64}
-              className="h-full w-full object-contain"
-              priority
-            />
-          </div>
-          <span className="inline-block rounded-full bg-sl-red px-3 py-1 text-[11px] font-medium uppercase tracking-wider">
-            Summer 2026
-          </span>
-        </div>
-        <h1 className="mt-4 text-3xl font-medium leading-tight sm:text-5xl">
+        <span className="inline-block rounded-full bg-sl-red px-3 py-1 text-[11px] font-medium uppercase tracking-wider">
+          Manor Lanes · Summer 2026
+        </span>
+        <h1 className="mt-3 text-3xl font-medium leading-tight sm:text-5xl">
           Summer <span className="text-sl-gold">Strikes</span>
           <br />
           Bowl Free All Summer
@@ -57,8 +43,27 @@ export default function LandingPage() {
         >
           Register now →
         </Link>
-        <div className="pointer-events-none absolute -bottom-2 right-5 text-7xl opacity-10 sm:text-9xl">
-          🎳
+        {/* Manor Lanes brand mark — bottom-right corner of the hero. Sits in
+            a white rounded chip so the navy logo reads against the navy bg. */}
+        <div className="pointer-events-none absolute bottom-5 right-5 hidden sm:flex h-24 w-24 items-center justify-center rounded-2xl bg-white p-2.5 shadow-md">
+          <Image
+            src="/manor-lanes-logo.svg"
+            alt="Manor Lanes"
+            width={96}
+            height={96}
+            className="h-full w-full object-contain"
+            priority
+          />
+        </div>
+        {/* Mobile: smaller logo in the same spot — keeps the hero from getting too tall on phones */}
+        <div className="pointer-events-none absolute bottom-4 right-4 flex h-16 w-16 items-center justify-center rounded-xl bg-white p-1.5 shadow-md sm:hidden">
+          <Image
+            src="/manor-lanes-logo.svg"
+            alt="Manor Lanes"
+            width={64}
+            height={64}
+            className="h-full w-full object-contain"
+          />
         </div>
       </section>
 

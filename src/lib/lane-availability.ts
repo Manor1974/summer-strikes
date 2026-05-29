@@ -164,8 +164,16 @@ export async function getLaneStatus(): Promise<LaneStatus> {
   }
 
   // We're within today's open window — fetch live lane count.
+  // CACHE-BUST: Cloudflare in front of Kinsta serves /lm/data/*.json with
+  // `Cache-Control: public, max-age=31536000` (1 year) — even after the
+  // PHP receiver writes a fresh file, CF keeps serving stale until the
+  // cached URL expires or we change the URL. Until the .htaccess fix on
+  // the Kinsta side lands (task #23), we vary the URL every 30s so CF
+  // misses and refetches from origin. Vercel's data cache still works
+  // within each 30s window because the URL is identical for that bucket.
+  const bucket = Math.floor(Date.now() / 30_000);
   try {
-    const res = await fetch(FEED_URL, {
+    const res = await fetch(`${FEED_URL}?t=${bucket}`, {
       next: { revalidate: 30, tags: ["lane-availability"] },
     });
     if (!res.ok) return { status: "unknown" };

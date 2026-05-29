@@ -50,7 +50,7 @@ const FAQS: { category: string; items: FaqItem[] }[] = [
     items: [
       {
         q: "When can my kids bowl?",
-        a: "Monday through Friday: 5pm–11pm. Saturdays: every other Saturday 5pm–11pm, starting May 30, 2026 (May 30, June 13, June 27, July 11, July 25, August 8, August 22). We're closed for Summer Strikes on Sundays.",
+        a: "Monday through Friday: 5pm–11pm. Saturdays: select Saturdays only, 5pm–11pm — May 30, June 13, June 27, July 11, July 25, August 1, August 22. We're closed for Summer Strikes on Sundays and on Saturdays not listed above.",
       },
       {
         q: "When does the program run?",

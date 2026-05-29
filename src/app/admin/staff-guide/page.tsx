@@ -89,7 +89,7 @@ export default function StaffGuidePage() {
                 ["Wednesday", "5:00pm – 11:00pm"],
                 ["Thursday", "5:00pm – 11:00pm"],
                 ["Friday", "5:00pm – 11:00pm"],
-                ["Saturday", "5:00pm – 11:00pm · every other Sat"],
+                ["Saturday", "5:00pm – 11:00pm · select Saturdays"],
                 ["Sunday", null],
               ].map(([day, hours]) => (
                 <tr key={day} className="border-b border-sl-navy/10 last:border-0">
@@ -102,8 +102,9 @@ export default function StaffGuidePage() {
             </tbody>
           </table>
           <p className="mt-2 text-[11px] text-sl-navy/60">
-            Open Saturdays starting May 30, 2026: May 30, Jun 13, Jun 27,
-            Jul 11, Jul 25, Aug 8, Aug 22.
+            Open Saturdays 2026: <strong>May 30, Jun 13, Jun 27, Jul 11,
+            Jul 25, Aug 1, Aug 22</strong>. All other Saturdays are closed for
+            Summer Strikes.
           </p>
         </section>
 
@@ -239,10 +240,12 @@ export default function StaffGuidePage() {
                 &ldquo;Is this Saturday open?&rdquo;
               </dt>
               <dd className="mt-0.5 pl-1">
-                Saturdays alternate. Open Saturdays starting May 30, 2026 are:
-                <strong>&nbsp;May 30, Jun 13, Jun 27, Jul 11, Jul 25, Aug 8,
-                Aug 22</strong>. If you&apos;re unsure, check the dashboard
-                &mdash; it shows the live availability.
+                Open Summer Strikes Saturdays 2026:
+                <strong>&nbsp;May 30, Jun 13, Jun 27, Jul 11, Jul 25,
+                Aug 1, Aug 22</strong>. Any Saturday not on that list is
+                closed for the program (sometimes because we have a booked
+                event). If you&apos;re unsure, check the dashboard &mdash; it
+                shows live lane availability.
               </dd>
             </div>
             <div>

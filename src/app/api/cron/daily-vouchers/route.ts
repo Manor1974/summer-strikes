@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { todayInProgramTz, isProgramActive } from "@/lib/dates";
+import { isProgramDayToday } from "@/lib/program-hours";
 import { sendSms, smsTemplates } from "@/lib/twilio";
 
 // Triggered by Vercel Cron at 07:00 ET daily (see vercel.json).
@@ -30,6 +31,10 @@ export async function GET(req: NextRequest) {
 
   if (!isProgramActive()) {
     return NextResponse.json({ ok: true, skipped: "off-season" });
+  }
+  // Don't generate vouchers on Sundays or on Saturdays we're closed for events.
+  if (!isProgramDayToday()) {
+    return NextResponse.json({ ok: true, skipped: "closed-day" });
   }
 
   const { dateOnly, isoDate } = todayInProgramTz();

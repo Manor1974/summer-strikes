@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { existsSync } from "fs";
 import { join } from "path";
+import PrintButton from "./print-button";
 
 export const dynamic = "force-dynamic";
 
@@ -31,18 +32,13 @@ export default function StaffGuidePage() {
         }}
       />
 
-      <div className="no-print mb-4 flex items-center justify-between rounded-2xl border border-sl-gold/30 bg-sl-gold/10 px-4 py-3">
+      <div className="no-print mb-4 flex items-center justify-between gap-4 rounded-2xl border border-sl-gold/30 bg-sl-gold/10 px-4 py-3">
         <p className="text-sm text-sl-navy">
-          <strong>Save as PDF or print:</strong> press <kbd className="rounded border border-black/20 bg-white px-1.5 py-0.5 text-xs">Cmd</kbd> + <kbd className="rounded border border-black/20 bg-white px-1.5 py-0.5 text-xs">P</kbd> and pick &ldquo;Save as PDF&rdquo; (or print to a real printer).
+          <strong>Save as PDF or print:</strong> click the button, or press{" "}
+          <kbd className="rounded border border-black/20 bg-white px-1.5 py-0.5 text-xs">Cmd</kbd> +{" "}
+          <kbd className="rounded border border-black/20 bg-white px-1.5 py-0.5 text-xs">P</kbd> and pick &ldquo;Save as PDF&rdquo;.
         </p>
-        <button
-          onClick={() => window.print()}
-          className="rounded-md bg-sl-navy px-3 py-1.5 text-xs font-medium text-white hover:bg-sl-navy-light no-print"
-          // Server component — onClick won't work without 'use client'. Hide via CSS instead.
-          style={{ display: "none" }}
-        >
-          Print
-        </button>
+        <PrintButton />
       </div>
 
       <article className="mx-auto max-w-3xl bg-white p-8 text-sl-navy print:p-0">

@@ -30,10 +30,49 @@ export type LaneStatus =
   | { status: "closed_today"; nextOpenLabel: string | null }
   | { status: "unknown" };
 
-function nowET(): Date {
-  return new Date(
-    new Date().toLocaleString("en-US", { timeZone: "America/New_York" })
-  );
+// ET wall-clock parts (year, month, day, hour, minute, weekday) via Intl —
+// safer than the toLocaleString → new Date round-trip which depends on
+// locale string parsing and the server's local timezone.
+type EtParts = {
+  year: number;
+  month: number; // 1-12
+  day: number;
+  hour: number;
+  minute: number;
+  dayOfWeek: number; // 0=Sun, 6=Sat
+};
+
+function nowET(): EtParts {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/New_York",
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    hour12: false,
+    weekday: "short",
+  }).formatToParts(new Date());
+  const get = (t: string) =>
+    parts.find((p) => p.type === t)?.value ?? "0";
+  const dayNames = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
+  const weekdayShort = (parts.find((p) => p.type === "weekday")?.value ?? "")
+    .toLowerCase()
+    .slice(0, 3);
+  return {
+    year: parseInt(get("year"), 10),
+    month: parseInt(get("month"), 10),
+    day: parseInt(get("day"), 10),
+    hour: parseInt(get("hour"), 10) % 24, // 24h format
+    minute: parseInt(get("minute"), 10),
+    dayOfWeek: dayNames.indexOf(weekdayShort),
+  };
+}
+
+// Construct a Date representing midnight ET on the given ET date, for use
+// with hoursForDate / isOpenSaturday which need a JS Date.
+function etDateAsLocalDate(p: EtParts): Date {
+  return new Date(p.year, p.month - 1, p.day);
 }
 
 function parseTime12(label: string): number {
@@ -59,8 +98,8 @@ type ProgramWindow = {
 };
 
 // Today's hours window in ET wall-clock minutes, or fallback "next open day".
-function programWindowToday(): ProgramWindow {
-  const today = nowET();
+function programWindowToday(et: EtParts): ProgramWindow {
+  const today = etDateAsLocalDate(et);
   const todayHours = hoursForDate(today);
   if (todayHours) {
     const [openLabel, closeLabel] = todayHours.split("–").map((s) => s.trim());
@@ -73,16 +112,16 @@ function programWindowToday(): ProgramWindow {
     };
   }
   // Scan up to 14 days ahead for next open day
+  const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   for (let i = 1; i <= 14; i++) {
     const d = new Date(today);
     d.setDate(d.getDate() + i);
     if (hoursForDate(d)) {
-      const dayName = new Intl.DateTimeFormat("en-US", {
-        weekday: "long",
-        timeZone: "America/New_York",
-      }).format(d);
       const [openLabel] = (hoursForDate(d) || "").split("–").map((s) => s.trim());
-      return { isToday: false, nextOpenLabel: `${dayName} at ${openLabel}` };
+      return {
+        isToday: false,
+        nextOpenLabel: `${dayNames[d.getDay()]} at ${openLabel}`,
+      };
     }
   }
   return { isToday: false, nextOpenLabel: null };
@@ -106,14 +145,12 @@ export async function getLaneStatus(): Promise<LaneStatus> {
   // business hours). The truthful "are we open right now" comes from our
   // program-hours.ts which knows the real Mon-Fri 5-11pm + select Saturdays
   // schedule.
-  const window = programWindowToday();
+  const et = nowET();
+  const window = programWindowToday(et);
   if (!window.isToday) {
     return { status: "closed_today", nextOpenLabel: window.nextOpenLabel };
   }
-  const nowMins = (() => {
-    const d = nowET();
-    return d.getHours() * 60 + d.getMinutes();
-  })();
+  const nowMins = et.hour * 60 + et.minute;
   if (nowMins < window.openMins) {
     return { status: "opens_later_today", opensAt: window.openLabel };
   }

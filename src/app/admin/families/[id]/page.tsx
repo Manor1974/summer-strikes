@@ -3,6 +3,8 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { updateChildScore } from "../../actions";
 import VerifyPendingButton from "./verify-pending-button";
+import AddChildForm from "./add-child-form";
+import { appBaseUrl } from "@/lib/stripe";
 
 export default async function FamilyDetailPage({
   params,
@@ -51,9 +53,12 @@ export default async function FamilyDetailPage({
         Joined {user.createdAt.toLocaleString()} · {redeemedCount} vouchers redeemed · {totalGames} games
       </p>
 
-      <h2 className="mt-6 text-[11px] font-medium uppercase tracking-wider text-sl-navy/60">
-        Children
-      </h2>
+      <div className="mt-6 flex items-center justify-between">
+        <h2 className="text-[11px] font-medium uppercase tracking-wider text-sl-navy/60">
+          Children
+        </h2>
+        <AddChildForm userId={user.id} baseUrl={appBaseUrl()} />
+      </div>
       <div className="mt-2 grid gap-3 sm:grid-cols-2">
         {user.children.map((c) => (
           <form

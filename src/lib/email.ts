@@ -136,6 +136,50 @@ ${adultsLine ? `<p style="margin:0 0 12px;font-size:15px;line-height:1.55;">${ad
   };
 }
 
+export function passwordResetEmail(opts: {
+  firstName: string;
+  resetUrl: string;
+  expiresInHours: number;
+}) {
+  const { firstName, resetUrl, expiresInHours } = opts;
+  const subject = "Reset your Summer Strikes password";
+
+  const text = `Hi ${firstName},
+
+You (or someone using your email) asked to reset your Summer Strikes password.
+
+Click this link to set a new password (expires in ${expiresInHours} hour${expiresInHours === 1 ? "" : "s"}):
+
+${resetUrl}
+
+If you didn't ask for this, you can safely ignore this email — your password won't change.
+
+— Manor Lanes`;
+
+  const body = `<p style="margin:0 0 12px;font-size:15px;">Hi ${firstName},</p>
+<p style="margin:0 0 12px;font-size:15px;line-height:1.55;">
+  You (or someone using your email) asked to reset your Summer Strikes
+  password. Click below to set a new one:
+</p>
+
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" align="left" style="margin:8px 0 16px;">
+  <tr><td style="background:#c8102e;border-radius:8px;">
+    <a href="${resetUrl}" style="display:inline-block;padding:12px 24px;font-size:14px;font-weight:600;color:#ffffff;text-decoration:none;">Set a new password &rarr;</a>
+  </td></tr>
+</table>
+
+<p style="clear:both;margin:24px 0 12px;font-size:13px;line-height:1.55;color:#1a2744;opacity:0.6;">
+  This link expires in ${expiresInHours} hour${expiresInHours === 1 ? "" : "s"}. If you didn&rsquo;t ask
+  for this, you can safely ignore this email &mdash; your password won&rsquo;t change.
+</p>`;
+
+  return {
+    subject,
+    text,
+    html: emailShell({ preheader: "Reset link inside.", body }),
+  };
+}
+
 export function familyPassActiveEmail(
   firstName: string,
   adultNames: string[],

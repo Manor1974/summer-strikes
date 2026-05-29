@@ -66,13 +66,13 @@ export default function StaffGuidePage() {
             The program
           </h2>
           <p className="mt-2 text-sm leading-relaxed">
-            <strong>Summer Strikes</strong> is Manor Lanes&apos; free summer
-            bowling program for kids ages 2&ndash;15. Registered children get{" "}
-            <strong>2 free games per day</strong> during program hours, every
-            program day from <strong>June 1 through August 31</strong>.
+            <strong>Summer Strikes</strong>&nbsp;is Manor Lanes&apos; first-year
+            free summer bowling program for kids ages 2&ndash;15. Registered
+            children get <strong>2 free games per day</strong>&nbsp;during
+            program hours, every program day from <strong>June 1 through August 31</strong>.
             Family members age 16+ can join via a one-time{" "}
-            <strong>Family Pass ($49.95/person)</strong> for the same daily
-            benefit.
+            <strong>Family Pass ($49.95/person)</strong>&nbsp;for the same
+            daily benefit.
           </p>
         </section>
 
@@ -110,32 +110,32 @@ export default function StaffGuidePage() {
           </h2>
           <ol className="mt-2 space-y-2 pl-6 text-sm leading-relaxed">
             <li>
-              <strong>Customer shows their phone</strong> with a QR code per
-              family member (one for each kid, one for each Family Pass adult).
-              They&apos;ll come from the customer&apos;s dashboard at{" "}
+              <strong>Customer shows their phone</strong>&nbsp;with a QR code
+              per family member (one for each kid, one for each Family Pass
+              adult). They&apos;ll come from the customer&apos;s dashboard at{" "}
               <em>summer.manorlanes.com/dashboard</em>.
             </li>
             <li>
-              <strong>Scan each QR with the front-desk iPad&apos;s camera.</strong>{" "}
-              The voucher detail page opens automatically &mdash; it shows the
+              <strong>Scan each QR with the front-desk iPad&apos;s camera.</strong>&nbsp;The
+              voucher detail page opens automatically &mdash; it shows the
               family member&apos;s name, age, and a big red &ldquo;Mark
               redeemed&rdquo; button.
             </li>
             <li>
-              <strong>Confirm the name matches</strong> the person you&apos;re
-              checking in. If a kid&apos;s name doesn&apos;t match, do not
-              redeem &mdash; politely ask the parent.
+              <strong>Confirm the name matches</strong>&nbsp;the person
+              you&apos;re checking in. If a kid&apos;s name doesn&apos;t
+              match, do not redeem &mdash; politely ask the parent.
             </li>
             <li>
-              <strong>Tap &ldquo;Mark redeemed.&rdquo;</strong> The voucher
-              flips to a green &ldquo;Redeemed&rdquo; badge. The customer&apos;s
-              dashboard updates instantly. The family is good to start
-              bowling.
+              <strong>Tap &ldquo;Mark redeemed.&rdquo;</strong>&nbsp;The
+              voucher flips to a green &ldquo;Redeemed&rdquo; badge. The
+              customer&apos;s dashboard updates instantly. The family is good
+              to start bowling.
             </li>
             <li>
-              <strong>Once per day, per family member.</strong> If they try to
-              come back later the same day, the voucher will already show as
-              redeemed and the page will say so.
+              <strong>Once per day, per family member.</strong>&nbsp;If they
+              try to come back later the same day, the voucher will already
+              show as redeemed and the page will say so.
             </li>
           </ol>
         </section>
@@ -147,22 +147,22 @@ export default function StaffGuidePage() {
           </h2>
           <ul className="mt-2 space-y-1.5 pl-5 text-sm leading-relaxed text-sl-navy">
             <li>
-              <strong>Shoe rental is NOT included.</strong> Charge the standard
-              shoe rental rate for every person bowling.
+              <strong>Shoe rental is NOT included.</strong>&nbsp;Charge the
+              standard shoe rental rate for every person bowling.
             </li>
             <li>
-              The 2 free games per day is <strong>per registered family
-              member</strong>, not per family.
+              The 2 free games per day is <strong>per registered family member</strong>,
+              not per family.
             </li>
             <li>
-              <strong>No daycares, camps, business outings, or party groups.</strong>{" "}
-              This is for individual family use only. If a group shows up
-              wanting to use Summer Strikes vouchers as a discount, politely
-              decline and offer normal group pricing.
+              <strong>No daycares, camps, business outings, or party groups.</strong>&nbsp;This
+              is for individual family use only. If a group shows up wanting
+              to use Summer Strikes vouchers as a discount, politely decline
+              and offer normal group pricing.
             </li>
             <li>
-              <strong>Photo IDs not required</strong> &mdash; the QR code +
-              the name match is the verification.
+              <strong>Photo IDs not required</strong>&nbsp;&mdash; the QR
+              code + the name match is the verification.
             </li>
             <li>
               Lanes are <strong>first-come, first-served</strong>. On busy
@@ -190,9 +190,9 @@ export default function StaffGuidePage() {
             <div>
               <dt className="font-bold">&ldquo;I forgot my password.&rdquo;</dt>
               <dd className="mt-0.5 pl-1">
-                There&apos;s no self-serve reset yet. Take their email and
-                let the manager know &mdash; we can reset it from the admin
-                panel.
+                Tell them to use the &ldquo;Forgot password?&rdquo; link on
+                the login page &mdash; they&apos;ll get an email with a reset
+                link. No need to involve staff.
               </dd>
             </div>
             <div>
@@ -200,9 +200,15 @@ export default function StaffGuidePage() {
                 &ldquo;Can I add more kids/adults later?&rdquo;
               </dt>
               <dd className="mt-0.5 pl-1">
-                Adults: yes &mdash; from their dashboard, &ldquo;+ Add Family
-                Pass adult.&rdquo; New kids: take the parent&apos;s email and
-                ask the manager to add them from the admin panel.
+                <strong>Adults:</strong>&nbsp;yes &mdash; from their dashboard,
+                &ldquo;+ Add Family Pass adult.&rdquo;
+                <br />
+                <strong>New kids:</strong>&nbsp;you can add them on the spot.
+                In the admin panel, go to Families, click on the parent&apos;s
+                name, scroll to &ldquo;Children&rdquo;, click &ldquo;+ Add
+                child.&rdquo; Today&apos;s voucher generates instantly and the
+                QR code shows right there &mdash; turn the iPad around to scan
+                it for them and start their games immediately.
               </dd>
             </div>
             <div>

@@ -44,6 +44,59 @@ export async function unredeemVoucher(voucherId: string) {
   revalidatePath(`/admin/families`);
 }
 
+// Add a new child to an existing family, on the spot at the desk. If today
+// is a program day (or any vouchers already exist for today for this family),
+// also generate today's voucher for the new child so staff can scan the QR
+// immediately and the kid starts bowling.
+export async function addChildToFamily(input: {
+  userId: string;
+  name: string;
+  age: number;
+  generateTodayVoucher?: boolean;
+}) {
+  const session = await requireAdmin();
+  if (!session) throw new Error("Unauthorized");
+
+  const name = input.name.trim();
+  if (name.length < 2) throw new Error("Child's full name required");
+  if (!Number.isInteger(input.age) || input.age < 2 || input.age > 15) {
+    throw new Error("Age must be a whole number between 2 and 15");
+  }
+
+  const child = await prisma.child.create({
+    data: { userId: input.userId, name, age: input.age },
+  });
+
+  let voucher: { id: string } | null = null;
+  if (input.generateTodayVoucher) {
+    const { dateOnly } = todayInProgramTz();
+    voucher = await prisma.voucher.upsert({
+      where: {
+        childId_validDate: { childId: child.id, validDate: dateOnly },
+      },
+      create: {
+        userId: input.userId,
+        childId: child.id,
+        validDate: dateOnly,
+      },
+      update: {},
+      select: { id: true },
+    });
+  }
+
+  revalidatePath(`/admin/families/${input.userId}`);
+  revalidatePath("/admin/families");
+  revalidatePath("/admin");
+  revalidatePath("/dashboard");
+
+  return {
+    ok: true,
+    childId: child.id,
+    childName: child.name,
+    voucherId: voucher?.id ?? null,
+  };
+}
+
 export async function updateChildScore(childId: string, highScore: number) {
   const session = await requireAdmin();
   if (!session) throw new Error("Unauthorized");

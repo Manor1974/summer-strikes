@@ -155,6 +155,24 @@ export default async function DashboardPage() {
         </span>
       </div>
 
+      {/* Reservation code — tell the desk this to claim a lane without going through mybowlingpassport */}
+      {user.reservationCode && (
+        <div className="mt-3 flex items-center justify-between gap-3 rounded-2xl border border-sl-gold/30 bg-sl-gold/10 px-4 py-3">
+          <div>
+            <p className="text-[11px] font-medium uppercase tracking-wider text-sl-gold">
+              Your family reservation code
+            </p>
+            <p className="mt-1 text-2xl font-bold tracking-wider text-sl-navy font-mono">
+              {user.reservationCode}
+            </p>
+          </div>
+          <p className="max-w-[160px] text-right text-[11px] text-sl-navy/70">
+            Show this at the desk to reserve a lane &mdash; no payment, no
+            checkout.
+          </p>
+        </div>
+      )}
+
       {/* Stats row */}
       <div className="mt-3 grid grid-cols-3 gap-2.5">
         <Stat value={gamesBowled} label="Games bowled" />

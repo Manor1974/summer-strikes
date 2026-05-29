@@ -17,6 +17,7 @@ export default async function FamiliesPage({
             { lastName: { contains: query, mode: "insensitive" } },
             { email: { contains: query, mode: "insensitive" } },
             { phone: { contains: query } },
+            { reservationCode: { equals: query.toUpperCase() } },
           ],
           role: "PARENT",
         }
@@ -43,7 +44,7 @@ export default async function FamiliesPage({
         <input
           name="q"
           defaultValue={query}
-          placeholder="Search by name, email, or phone…"
+          placeholder="Search by name, email, phone, or reservation code…"
           className="h-10 w-full rounded-md border border-black/10 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-sl-navy/20"
         />
       </form>

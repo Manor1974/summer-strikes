@@ -39,13 +39,27 @@ export default async function FamilyDetailPage({
         ← All families
       </Link>
 
-      <h1 className="mt-3 text-xl font-medium text-sl-navy">
-        {user.firstName} {user.lastName}
-      </h1>
-      <p className="text-sm text-sl-navy/60">
-        {user.email} · {user.phone ? formatPhone(user.phone) : "no phone"} ·{" "}
-        SMS {user.smsOptIn ? "ON" : "OFF"}
-      </p>
+      <div className="mt-3 flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-xl font-medium text-sl-navy">
+            {user.firstName} {user.lastName}
+          </h1>
+          <p className="text-sm text-sl-navy/60">
+            {user.email} · {user.phone ? formatPhone(user.phone) : "no phone"} ·{" "}
+            SMS {user.smsOptIn ? "ON" : "OFF"}
+          </p>
+        </div>
+        {user.reservationCode && (
+          <div className="rounded-md border border-sl-gold/30 bg-sl-gold/10 px-3 py-2 text-right">
+            <p className="text-[10px] font-medium uppercase tracking-wider text-sl-gold">
+              Reservation code
+            </p>
+            <p className="mt-0.5 font-mono text-lg font-bold tracking-wider text-sl-navy">
+              {user.reservationCode}
+            </p>
+          </div>
+        )}
+      </div>
       <p className="mt-1 text-xs text-sl-navy/50">
         {user.address}, {user.city}, {user.state} {user.zip}
       </p>

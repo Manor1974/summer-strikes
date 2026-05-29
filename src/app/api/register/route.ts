@@ -6,6 +6,7 @@ import { sendSms, smsTemplates } from "@/lib/twilio";
 import { sendEmail, welcomeEmail } from "@/lib/email";
 import { createFamilyPassCheckout } from "@/lib/family-pass";
 import { postToFbtReceiver } from "@/lib/fbt-export";
+import { generateUniqueReservationCode } from "@/lib/reservation-code";
 
 function getClientIp(req: NextRequest): string {
   const fwd = req.headers.get("x-forwarded-for");
@@ -43,6 +44,7 @@ export async function POST(req: NextRequest) {
 
   const passwordHash = await bcrypt.hash(data.password, 12);
   const phoneE164 = data.phone ? normalizePhoneE164(data.phone) : null;
+  const reservationCode = await generateUniqueReservationCode();
   const now = new Date();
 
   const user = await prisma.user.create({
@@ -60,6 +62,7 @@ export async function POST(req: NextRequest) {
       smsConsentAt: data.smsOptIn && phoneE164 ? now : null,
       smsConsentIp: data.smsOptIn && phoneE164 ? ip : null,
       termsAcceptedAt: now,
+      reservationCode,
       children: {
         create: data.children.map((c) => ({ name: c.name, age: c.age })),
       },

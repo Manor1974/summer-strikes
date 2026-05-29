@@ -33,6 +33,7 @@ model User {
   smsConsentIp        String?
   termsAcceptedAt     DateTime
   role                Role      @default(PARENT)
+  reservationCode     String?   @unique @db.VarChar(8)
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
 

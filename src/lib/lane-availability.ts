@@ -51,8 +51,11 @@ type Feed = {
 export async function getLaneStatus(): Promise<LaneStatus> {
   try {
     const res = await fetch(FEED_URL, {
-      // Match the poller's ~60s cadence — no point caching longer than that.
-      next: { revalidate: 60, tags: ["lane-availability"] },
+      // Tight cache: 30s. The FRONTDESK1 poller writes the JSON every ~60s,
+      // so worst-case our dashboard trails real lane state by ~90s. Never
+      // less than 30s though — protects manorlanes.com from a hammer if
+      // many parents are on the dashboard at once.
+      next: { revalidate: 30, tags: ["lane-availability"] },
     });
     if (!res.ok) return { status: "unknown" };
     const feed = (await res.json()) as Feed;

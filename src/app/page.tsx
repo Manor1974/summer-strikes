@@ -44,25 +44,17 @@ export default function LandingPage() {
           Register now →
         </Link>
         {/* Manor Lanes brand mark — bottom-right corner of the hero.
-            White-variant logo sits directly on the navy bg (no chip needed). */}
-        <div className="pointer-events-none absolute bottom-5 right-5 hidden sm:block">
+            White-variant logo sits directly on the navy bg. Sizing uses
+            clamp() so the logo scales smoothly between 96px (small phones)
+            and 176px (wide desktops) — no breakpoint jumps. */}
+        <div className="pointer-events-none absolute bottom-4 right-4 sm:bottom-5 sm:right-5">
           <Image
             src="/manor-lanes-logo-white.png"
             alt="Manor Lanes"
-            width={128}
-            height={128}
-            className="h-28 w-auto object-contain"
+            width={176}
+            height={176}
+            className="h-[clamp(6rem,16vw,11rem)] w-auto object-contain"
             priority
-          />
-        </div>
-        {/* Mobile: smaller logo in the same spot */}
-        <div className="pointer-events-none absolute bottom-4 right-4 sm:hidden">
-          <Image
-            src="/manor-lanes-logo-white.png"
-            alt="Manor Lanes"
-            width={80}
-            height={80}
-            className="h-16 w-auto object-contain"
           />
         </div>
       </section>

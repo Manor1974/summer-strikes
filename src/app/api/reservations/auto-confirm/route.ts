@@ -130,10 +130,8 @@ export async function POST(req: Request) {
         console.error("[auto-confirm] SMS failed:", err)
       );
     }
-    sendEmail({
-      to: reservation.user.email,
-      subject: `Reservation confirmed — ${dateStr} at ${timeStr} on lane ${body.lane_number}`,
-      text: `Hi ${reservation.user.firstName},
+    {
+      const confirmText = `Hi ${reservation.user.firstName},
 
 Your Summer Strikes reservation is confirmed:
 
@@ -144,8 +142,26 @@ Your Summer Strikes reservation is confirmed:
 
 See you at Manor Lanes!
 
-— Manor Lanes`,
-    }).catch((err) => console.error("[auto-confirm] email failed:", err));
+— Manor Lanes`;
+      sendEmail({
+        to: reservation.user.email,
+        subject: `Reservation confirmed — ${dateStr} at ${timeStr} on lane ${body.lane_number}`,
+        text: confirmText,
+        html: `<div style="font-family:ui-sans-serif,system-ui,sans-serif;max-width:560px;margin:0 auto;padding:24px;color:#1a2744;">
+  <h2 style="margin:0 0 12px;font-size:18px;">Reservation confirmed</h2>
+  <p>Hi ${reservation.user.firstName},</p>
+  <p>Your Summer Strikes reservation is confirmed:</p>
+  <table style="border-collapse:collapse;margin:12px 0;font-size:14px;">
+    <tr><td style="padding:4px 12px 4px 0;color:#1a2744;opacity:0.6;">When</td><td style="padding:4px 0;font-weight:600;">${dateStr} &middot; ${timeStr}</td></tr>
+    <tr><td style="padding:4px 12px 4px 0;color:#1a2744;opacity:0.6;">Lane</td><td style="padding:4px 0;font-weight:700;">${body.lane_number}</td></tr>
+    <tr><td style="padding:4px 12px 4px 0;color:#1a2744;opacity:0.6;">Party size</td><td style="padding:4px 0;font-weight:600;">${reservation.partySize}</td></tr>
+    <tr><td style="padding:4px 12px 4px 0;color:#1a2744;opacity:0.6;">Family code</td><td style="padding:4px 0;font-family:monospace;font-weight:700;">${reservation.user.reservationCode ?? ""}</td></tr>
+  </table>
+  <p>See you at Manor Lanes!</p>
+  <p style="margin-top:24px;color:#1a2744;opacity:0.6;font-size:12px;">Manor Lanes &middot; Summer Strikes 2026</p>
+</div>`,
+      }).catch((err) => console.error("[auto-confirm] email failed:", err));
+    }
 
     return NextResponse.json({
       ok: true,
@@ -172,17 +188,27 @@ See you at Manor Lanes!
       `Manor Lanes: sorry — no lanes available for ${dateStr} at ${timeStr}. Try a different time at summer.manorlanes.com/dashboard.`
     ).catch((err) => console.error("[auto-confirm] decline SMS failed:", err));
   }
-  sendEmail({
-    to: reservation.user.email,
-    subject: `Unable to confirm — ${dateStr} at ${timeStr}`,
-    text: `Hi ${reservation.user.firstName},
+  {
+    const declineText = `Hi ${reservation.user.firstName},
 
 Unfortunately we couldn't confirm your reservation for ${dateStr} at ${timeStr} — all lanes are booked at that time.
 
 Pick a different time at summer.manorlanes.com/dashboard.
 
-— Manor Lanes`,
-  }).catch((err) => console.error("[auto-confirm] decline email failed:", err));
+— Manor Lanes`;
+    sendEmail({
+      to: reservation.user.email,
+      subject: `Unable to confirm — ${dateStr} at ${timeStr}`,
+      text: declineText,
+      html: `<div style="font-family:ui-sans-serif,system-ui,sans-serif;max-width:560px;margin:0 auto;padding:24px;color:#1a2744;">
+  <h2 style="margin:0 0 12px;font-size:18px;">Unable to confirm</h2>
+  <p>Hi ${reservation.user.firstName},</p>
+  <p>Unfortunately we couldn't confirm your reservation for <strong>${dateStr} at ${timeStr}</strong> — all lanes are booked at that time.</p>
+  <p><a href="https://summer.manorlanes.com/dashboard" style="display:inline-block;background:#1a2744;color:#fff;text-decoration:none;padding:10px 16px;border-radius:6px;font-weight:600;">Pick a different time</a></p>
+  <p style="margin-top:24px;color:#1a2744;opacity:0.6;font-size:12px;">Manor Lanes &middot; Summer Strikes 2026</p>
+</div>`,
+    }).catch((err) => console.error("[auto-confirm] decline email failed:", err));
+  }
 
   return NextResponse.json({ ok: true, status: "CANCELLED", declined: true });
 }

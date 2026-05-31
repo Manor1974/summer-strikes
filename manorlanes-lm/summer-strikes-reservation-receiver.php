@@ -96,11 +96,16 @@ foreach ($required as $key) {
 }
 
 // Normalize + clamp
+// lane_number=0 is a sentinel meaning "FRONTDESK1, pick a free lane for me"
+// (the PowerShell writer queries Conqueror's RsrvBody to find one at the
+// requested time). Anything else is clamped to a valid 1-24 lane.
+$raw_lane = (int)$r['lane_number'];
+$lane_number = ($raw_lane === 0) ? 0 : max(1, min(24, $raw_lane));
 $normalized = [
     'id'               => (string)$r['id'],
     'reservation_date' => (string)$r['reservation_date'],
     'start_time'       => (string)$r['start_time'],
-    'lane_number'      => max(1, min(24, (int)$r['lane_number'])),
+    'lane_number'      => $lane_number,
     'party_size'       => max(1, min(24, (int)$r['party_size'])),
     'family_code'      => (string)($r['family_code'] ?? ''),
     'first_name'       => trim((string)($r['first_name'] ?? '')),

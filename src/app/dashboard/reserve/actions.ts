@@ -84,7 +84,28 @@ export async function createReservation(input: unknown) {
     },
   });
 
-  // Fire-and-forget notifications (don't block the user's redirect)
+  // Auto-assign flow: post immediately to the manorlanes.com receiver with
+  // lane_number=0. FRONTDESK1's PowerShell writer queries Conqueror for a
+  // free lane at the requested time and calls back to /api/reservations/auto-confirm
+  // with the assignment. No human in the loop unless the auto-assign fails.
+  postToReservationReceiver({
+    id: reservation.id,
+    reservation_date: data.reservationDate,
+    start_time: data.startTime,
+    lane_number: 0, // 0 = "PowerShell, you pick"
+    party_size: data.partySize,
+    family_code: reservation.user.reservationCode ?? "",
+    first_name: reservation.user.firstName,
+    last_name: reservation.user.lastName,
+    email: reservation.user.email,
+    phone: reservation.user.phone ?? "",
+    notes: data.notes ?? "",
+  }).catch((err) =>
+    console.error("[reservation/create] receiver POST failed:", err)
+  );
+
+  // Customer notification ("request received — we'll text you the lane")
+  // + admin email for visibility (no action needed unless auto-assign fails)
   Promise.allSettled([
     notifyCustomer(reservation),
     notifyAdmins(reservation),
@@ -178,7 +199,7 @@ Your reservation request for Summer Strikes is in:
   Party size:  ${r.partySize}
   Family code: ${r.user.reservationCode}
 
-We'll confirm shortly and assign your lane. Show your reservation code at the desk if asked.
+Our system is checking lane availability — you'll get a text within about a minute with your lane number.
 
 — Manor Lanes`;
   await sendEmail({
@@ -201,7 +222,7 @@ We'll confirm shortly and assign your lane. Show your reservation code at the de
   if (r.user.smsOptIn && r.user.phone) {
     await sendSms(
       r.user.phone,
-      `Manor Lanes: reservation request received for ${dateStr} at ${timeStr}. We'll text you when it's confirmed.`
+      `Manor Lanes: reservation request received for ${dateStr} at ${timeStr}. We'll text you the lane number within about a minute.`
     );
   }
 }

@@ -52,7 +52,9 @@ export async function createReservation(input: unknown) {
   const existing = await prisma.reservation.findFirst({
     where: {
       userId: session.user.id,
-      reservationDate: new Date(`${data.reservationDate}T00:00:00Z`),
+      // Store as noon UTC so the date doesn't roll back a day when displayed in ET.
+      // (Midnight UTC = 8pm previous day in ET, which made "Mon Jun 1" show as "Sun May 31".)
+      reservationDate: new Date(`${data.reservationDate}T12:00:00Z`),
       status: { in: ["REQUESTED", "CONFIRMED"] },
     },
   });
@@ -65,7 +67,9 @@ export async function createReservation(input: unknown) {
   const reservation = await prisma.reservation.create({
     data: {
       userId: session.user.id,
-      reservationDate: new Date(`${data.reservationDate}T00:00:00Z`),
+      // Store as noon UTC so the date doesn't roll back a day when displayed in ET.
+      // (Midnight UTC = 8pm previous day in ET, which made "Mon Jun 1" show as "Sun May 31".)
+      reservationDate: new Date(`${data.reservationDate}T12:00:00Z`),
       startTime: data.startTime,
       partySize: data.partySize,
       notes: data.notes || null,

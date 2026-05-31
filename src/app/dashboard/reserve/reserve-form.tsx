@@ -145,7 +145,7 @@ export default function ReserveForm({
         disabled={pending || validDates.length === 0}
         className="w-full rounded-md bg-sl-red px-4 py-3 text-sm font-medium text-white hover:bg-sl-red-dark disabled:opacity-50"
       >
-        {pending ? "Submitting…" : "Request reservation"}
+        {pending ? "Submitting…" : "Reserve a lane"}
       </button>
     </form>
   );
